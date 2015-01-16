@@ -1,0 +1,36 @@
+%b
+  %font{:size => "+1"}
+    Welcome #{current_user ? current_user.email : ''}
+%br/
+%br/
+= Time.now
+%p
+  - if current_user
+    %table{:border => "1", :cellpadding => "2", :cellspacing => "2", :width => "100%"}
+      %tbody
+        %tr
+          %td{:valign => "top"}
+            %b Message
+            = link_to 'New Message', new_message_path
+            %br/
+          %td{:valign => "top"}
+            %b Posted By
+            %br/
+          %td{:valign => "top"}
+            %b Action
+            %br/
+        - Message.all.each do |m|
+          %tr
+            %td{:valign => "top"}
+              %br/
+              = m.text
+            %td{:valign => "top"}
+              %br/
+              = m.user.email
+            %td{:valign => "top"}
+              %br/
+              = link_to 'Delete Message', m, method: :delete
+    %p
+      %a{"data-method" => "delete", :href => "/users/sign_out", :rel => "nofollow"} Logout
+  - else
+    %a{:href => "/users/sign_in"} Login
