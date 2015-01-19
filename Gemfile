@@ -41,3 +41,5 @@ gem 'devise'
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+# Skeleton for implementing LDAP server applications
+gem 'ruby-ldapserver', '~> 0.5.0'
