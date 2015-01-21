@@ -1,4 +1,4 @@
-class LdapServerHelper
+class LdapServerCounter
   @@count = 0
 
   def self.increment

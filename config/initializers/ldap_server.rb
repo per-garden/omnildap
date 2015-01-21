@@ -9,12 +9,12 @@ if !$rails_rake_task
     server = LDAP::Server.new(params)
     server.run_tcpserver
   end
-  LdapServerHelper.increment
+  LdapServerCounter.increment
 
   # Stop (triggered by stopping rails app itself, i.e. ctrl-c)
   at_exit do
     # Last rails process running makes sure spring shuts down too
-    if LdapServerHelper.decrement < 1
+    if LdapServerCounter.decrement < 1
       `spring stop`
       if server
         server.stop 
