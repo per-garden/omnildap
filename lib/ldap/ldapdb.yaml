@@ -1,0 +1,12 @@
+---
+dc=example,dc=com:
+  cn:
+  - Top object
+cn=fred flintstone,dc=example,dc=com:
+  cn:
+  - Fred Flintstone
+  sn:
+  - Flintstone
+  mail:
+  - fred@bedrock.org
+  - fred.flintstone@bedrock.org
