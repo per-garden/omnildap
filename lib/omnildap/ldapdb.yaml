@@ -1,12 +1,9 @@
 ---
-dc=example,dc=com:
+dc=omnildap:
   cn:
   - Top object
-cn=fred flintstone,dc=example,dc=com:
+cn=omnildap,dc=omnildap:
   cn:
-  - Fred Flintstone
-  sn:
-  - Flintstone
+  - Omnildap
   mail:
-  - fred@bedrock.org
-  - fred.flintstone@bedrock.org
+  - omnildap@omnildap.org
