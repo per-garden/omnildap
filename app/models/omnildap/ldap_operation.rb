@@ -18,6 +18,7 @@ module Omnildap
       case scope
       # TODO: single object how/what?
       when LDAP::Server::BaseObject
+        # ALog.debug 'client asked for single object by DN'
         # client asked for single object by DN
         obj = @hash[LdapOperation.basedn]
         raise LDAP::ResultError::NoSuchObject unless obj
