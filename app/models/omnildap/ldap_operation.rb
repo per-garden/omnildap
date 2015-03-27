@@ -13,7 +13,7 @@ module Omnildap
   
     def search(basedn, scope, deref, filter)
       basedn.downcase!
-      common_name = basedn.split(/\W+/)[1]
+      name = basedn.split(/\W+/)[1]
 
       case scope
       # TODO: single object how/what?
@@ -25,8 +25,8 @@ module Omnildap
         send_SearchResultEntry(basedn, obj) if LDAP::Server::Filter.run(filter, obj)
   
       when LDAP::Server::WholeSubtree
-        u = User.find_by_common_name(common_name)
-        send_SearchResultEntry(basedn, {'cn' => [u.common_name], 'mail' => [u.email]}) if u
+        u = User.find_by_name(name)
+        send_SearchResultEntry(basedn, {'cn' => [u.name], 'mail' => [u.email]}) if u
   
       else
         raise LDAP::ResultError::UnwillingToPerform, "OneLevel not implemented"
