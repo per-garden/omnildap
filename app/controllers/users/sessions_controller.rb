@@ -3,23 +3,21 @@ class Users::SessionsController < Devise::SessionsController
     email = params['user']['email']
     current_user = User.find_by_email(email)
     unless current_user
+      # Name for backend is what's in front of the mail domain
+      name = email.split('@')[0]
       password = params['user']['password']
-      backend_signup(email, password)
+      backends_signup(email, name, password)
     end
     super
   end
 
   private
 
-  def backend_signup(email, password)
-    # Name for backend is what's in front of the mail domain
-    name = email.split('@')[0]
-    ldap = Net::LDAP.new
-    ldap.port = 10389
-    ldap.base = 'ou=seldlx3031_apache_ds,dc=example,dc=com'
-    ldap.authenticate("cn=#{name},ou=seldlx3031_apache_ds,dc=example,dc=com", password)
-    if ldap.bind
-      User.create!(email: email, name: name, password: password, password_confirmation: password)
+  def backends_signup(email, name, password)
+    # With which backends does user already exist?
+    Backend.all.each do |b|
+      b.signup(email, name, password)
     end
   end
+
 end
