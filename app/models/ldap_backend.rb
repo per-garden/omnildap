@@ -1,0 +1,2 @@
+class LdapBackend < Backend
+end
