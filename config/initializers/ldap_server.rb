@@ -1,26 +1,20 @@
 if !$rails_rake_task
-  # Start
   if `spring status`.start_with?('Spring is not running')
-    `spring start`
-    directory = {}
-    # FIXME: Ldap data to be read dynamically - not hard coded from file.
-    File.open("lib/omnildap/ldapdb.yaml") { |f| directory = YAML::load(f.read) }
-    params = Rails.application.config.ldap_server
-    params[:operation_class] = Omnildap::LdapOperation
-    params[:operation_args] = [directory]
-    server = LDAP::Server.new(params)
-    server.run_tcpserver
+  `spring start`
   end
-  Omnildap::LdapServerCounter.increment
+  unless File.exists?("#{Rails.root}/tmp/pids/sidekiq.pid")
+   `bundle exec sidekiq -e "#{$RAILS_ENV}" -P "#{Rails.root}"/tmp/pids/sidekiq.pid $@ >> "#{Rails.root}"/log/sidekiq.log 2>&1`
+  end
+  LdapWorker.perform_async
 
   # Stop (triggered by stopping rails app itself, i.e. ctrl-c)
   at_exit do
-    # Last rails process running makes sure spring shuts down too
-    if Omnildap::LdapServerCounter.decrement < 1
+    Omnildap::LdapServer.stop
+    if File.exists?("#{Rails.root}/tmp/pids/sidekiq.pid")
+      `bundle exec sidekiqctl stop "#{Rails.root}"/tmp/pids/sidekiq.pid >> "#{Rails.root}"/log/sidekiq.log 2>&1`
+    end
+    unless `spring status`.start_with?('Spring is not running')
       `spring stop`
-      if server
-        server.stop 
-      end
     end
   end
 end
