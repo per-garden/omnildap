@@ -26,10 +26,14 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0',          group: :doc
 
-group :development do
+group :development, :test do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring' # , '1.3.1'
   gem 'erb2haml'
+  gem 'rspec-rails'
+  gem 'capybara'
+  gem 'pry-rails'
+  gem 'factory_girl_rails'
 end
 
 # Use ActiveModel has_secure_password
@@ -49,3 +53,6 @@ gem 'net-ldap'
 # Skeleton for implementing LDAP server applications
 gem 'deveo-ruby-ldapserver', '~> 0.5.2'
 # gem 'ruby-ldapserver', '~> 0.5.0'
+
+# Background jobs
+gem 'sidekiq', '~> 3.3'
