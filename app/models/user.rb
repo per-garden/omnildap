@@ -5,4 +5,5 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
   validates_presence_of :name, :email
   has_and_belongs_to_many :backends
+  validates_presence_of :backends, :message => 'must not be empty'
 end
