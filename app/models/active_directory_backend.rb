@@ -1,0 +1,2 @@
+class ActiveDirectoryBackend < LdapBackend
+end
