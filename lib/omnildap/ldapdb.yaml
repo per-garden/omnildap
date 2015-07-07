@@ -1,5 +1,6 @@
-dc=omnildap:
-  cn: 'Top object'
 cn=omnildap,dc=omnildap:
-  cn: Omnildap
+  cn: omnildap
   mail: omnildap@omnildap.org
+cn=blurp,dc=omnildap:
+  cn: blurp
+  mail: blurpldap@omnildap.org
