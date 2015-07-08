@@ -41,5 +41,6 @@ Rails.application.configure do
     :nodelay                => true,
     :listen                 => 10,
     :operation_class        => HashOperation,
+    :operation_args         => [],
   }
 end

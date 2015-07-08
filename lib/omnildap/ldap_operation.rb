@@ -1,19 +1,24 @@
 module Omnildap
   class LdapOperation < LDAP::Server::Operation
-    # @basedn = 'cn=omnildap,dc=omnildap'
+    # FIXME: Base from configuration
+    @basedn = 'dc=omnildap'
 
     class << self
       attr_reader :basedn
     end
 
-    def initialize(connection, messageID, hash)
+    def initialize(connection, messageID, hash = {})
       super(connection, messageID)
-      @hash = hash
+      @hash = {}
+      User.all.each do |u|
+        entry = {}
+        entry['cn'] = u.name
+        entry['mail'] = u.email
+        @hash["cn=#{u.name},#{@basedn}"] = entry
+      end
     end
   
     def search(basedn, scope, deref, filter)
-      # ALog.debug 'Scope of search is:'
-      # ALog.debug scope.to_i.to_s
       basedn.downcase!
       name = basedn.split(/\W+/)[1]
 
@@ -30,7 +35,6 @@ module Omnildap
         raise LDAP::ResultError::UnwillingToPerform, "OneLevel not implemented"
       when 2
         @hash.keys.each do |key|
-          # ALog.debug 'Now sending ' + key
           obj = @hash[key]
           send_SearchResultEntry(basedn, obj) if obj && LDAP::Server::Filter.run(filter, obj)
         end

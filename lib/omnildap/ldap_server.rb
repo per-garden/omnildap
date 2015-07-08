@@ -9,7 +9,7 @@ module Omnildap
         File.open("lib/omnildap/ldapdb.yaml") { |f| directory = YAML::load(f.read) }
         params = Rails.application.config.ldap_server
         params[:operation_class] = Omnildap::LdapOperation
-        params[:operation_args] = [directory]
+        # params[:operation_args] = [directory]
         @@server = LDAP::Server.new(params)
         @@server.run_tcpserver
         # ALog.debug 'Started tcp_server'
@@ -19,7 +19,6 @@ module Omnildap
   
     def self.stop
       if @@server
-        # ALog.debug @@server
         @@server.stop
         # ALog.debug 'Stopped tcp_server'
         # Omnildap::LdapServerCounter.decrement
