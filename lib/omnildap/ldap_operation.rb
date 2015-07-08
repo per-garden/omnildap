@@ -29,11 +29,11 @@ module Omnildap
       when 1
         raise LDAP::ResultError::UnwillingToPerform, "OneLevel not implemented"
       when 2
-        basedn = @hash.keys[0]
-        obj = @hash[basedn]
-        send_SearchResultEntry(basedn, obj) if LDAP::Server::Filter.run(filter, obj)
-        # u = User.find_by_name(name)
-        # send_SearchResultEntry(basedn, {'cn' => [u.name], 'mail' => [u.email]}) if u
+        @hash.keys.each do |key|
+          # ALog.debug 'Now sending ' + key
+          obj = @hash[key]
+          send_SearchResultEntry(basedn, obj) if obj && LDAP::Server::Filter.run(filter, obj)
+        end
       when 3
         raise LDAP::ResultError::UnwillingToPerform, "Children not implemented"
       else
