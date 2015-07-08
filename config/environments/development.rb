@@ -43,4 +43,5 @@ Rails.application.configure do
     :operation_class        => HashOperation,
     :operation_args         => [],
   }
+  config.ldap_basedn = 'dc=omnildap'
 end

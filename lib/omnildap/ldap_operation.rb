@@ -7,8 +7,7 @@ module Omnildap
 
     def initialize(connection, messageID, hash = {})
       super(connection, messageID)
-      # FIXME: Base from configuration
-      @basedn = 'dc=omnildap'
+      @basedn = Rails.application.config.ldap_basedn
       @hash = hash
       User.all.each do |u|
         entry = {}
