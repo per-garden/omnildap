@@ -16,6 +16,25 @@ module Omnildap
         @hash["cn=#{u.name},#{@basedn}"] = entry
       end
     end
+
+    def simple_bind(version, dn, password)
+      if version != 3
+        raise LDAP::ResultError::ProtocolError, "version 3 only"
+      end
+      unless (dn && dn[0])
+        raise LDAP::ResultError::InappropriateAuthentication, "Missing bind credentials. Expecting name/email, password"
+      else
+        if dn.include?('@')
+          u = User.find_by_email(dn)
+        else
+          u = User.find_by_name(dn)
+        end
+        # FIXME: Only admin users for top level bind
+        unless u && u.valid_password?(password)
+          raise LDAP::ResultError::InvalidCredentials
+        end
+      end
+    end
   
     def search(basedn, scope, deref, filter = [:true])
       basedn.downcase!
