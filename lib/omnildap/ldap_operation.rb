@@ -29,7 +29,9 @@ module Omnildap
         else
           u = User.find_by_name(dn)
         end
-        # FIXME: Only admin users for top level bind
+        unless u && u.admin
+          raise LDAP::ResultError::InappropriateAuthentication, 'Binding user must be admin'
+        end
         unless u && u.valid_password?(password)
           raise LDAP::ResultError::InvalidCredentials
         end
