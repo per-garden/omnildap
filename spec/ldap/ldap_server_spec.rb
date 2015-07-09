@@ -7,14 +7,11 @@ describe Omnildap::LdapServer do
       LdapWorker.prepare
       LdapWorker.perform_async
     end
+    @client = Net::LDAP.new
+    @client.port = Rails.application.config.ldap_server[:port]
   end
 
   describe "when receiving a top-level bind request it" do
-    before :each do
-      @client = Net::LDAP.new
-      @client.port = Rails.application.config.ldap_server[:port]
-    end
-
     it "responds with Inappropriate Authentication to anonymous bind requests" do
       @client.bind.should be_falsey
       @client.get_operation_result.code.should == 48
