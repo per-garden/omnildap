@@ -3,6 +3,8 @@ require 'sidekiq/testing'
 
 describe Omnildap::LdapServer do
   before do
+    @admin = FactoryGirl.build :user, admin: true
+    @admin.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
       LdapWorker.perform_async
@@ -26,8 +28,13 @@ describe Omnildap::LdapServer do
     end
 
     it "responds affirmatively if the username and password are correct" do
-      skip 'TODO'
+      @client.authenticate(@admin.name, @admin.password)
+      @client.bind.should be_truthy
     end
 
+  end
+
+  after do
+    @admin.destroy
   end
 end

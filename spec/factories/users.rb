@@ -5,7 +5,6 @@ FactoryGirl.define do
     password password
     password_confirmation password
     name { Faker::Name.name }    
-    backends [FactoryGirl.build(:ldap_backend)]
+    backends [FactoryGirl.build(:devise_backend)]
   end
-
 end
