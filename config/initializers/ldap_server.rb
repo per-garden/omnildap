@@ -8,8 +8,10 @@ if !$rails_rake_task
     if File.exists?("#{Rails.root}/tmp/pids/sidekiq.pid")
       `bundle exec sidekiqctl stop "#{Rails.root}"/tmp/pids/sidekiq.pid >> "#{Rails.root}"/log/sidekiq.log 2>&1`
     end
-    unless `spring status`.start_with?('Spring is not running')
-      `spring stop`
+    silence_stream(STDERR) do
+      unless `spring status`.start_with?('Spring is not running')
+        `spring stop`
+      end
     end
   end
 end
