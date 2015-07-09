@@ -28,11 +28,14 @@ describe Omnildap::LdapServer do
     end
 
     it "responds with Invalid Credentials if admin credentials are incorrect" do
-      skip 'TODO'
+      @client.authenticate(@admin.name, 'not_' + @admin.password)
+      @client.bind.should be_falsey
     end
 
-    it "responds with Invalid Credentials if admin does not exist" do
-      skip 'TODO'
+    it "responds with bind result error if admin does not exist" do
+      @client.authenticate('not_' + @admin.name, @admin.password)
+      # Expecting Net::LDAP::NoBindResultError
+      @client.get_operation_result.code.should == 0
     end
 
     it "responds affirmatively if admin, and correct correct credentials" do

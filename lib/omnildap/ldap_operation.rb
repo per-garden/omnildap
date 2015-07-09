@@ -29,6 +29,9 @@ module Omnildap
         else
           u = User.find_by_name(dn)
         end
+        unless u
+          raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
+        end
         unless u && u.admin
           raise LDAP::ResultError::InappropriateAuthentication, 'Binding user must be admin'
         end
