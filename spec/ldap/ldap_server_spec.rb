@@ -7,6 +7,7 @@ describe Omnildap::LdapServer do
     @user.save!
     @admin = FactoryGirl.build(:admin)
     @admin.save!
+    @ldap_backend_user = FactoryGirl.build(:ldap_backend_user)
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
       LdapWorker.perform_async
@@ -43,6 +44,12 @@ describe Omnildap::LdapServer do
       @client.bind.should be_truthy
     end
 
+  end
+
+  describe 'using ldap backend' do
+    it 'finds existing user based on cn' do
+      skip 'TODO: Need fakeldap and setup here'
+    end
   end
 
   after do
