@@ -35,6 +35,7 @@ group :development, :test do
   gem 'pry-rails'
   gem 'factory_girl_rails'
   gem 'faker'
+  gem 'fakeldap', '~> 0.1'
 end
 
 # Use ActiveModel has_secure_password

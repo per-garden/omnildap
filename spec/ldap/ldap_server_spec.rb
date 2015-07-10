@@ -47,6 +47,14 @@ describe Omnildap::LdapServer do
   end
 
   describe 'using ldap backend' do
+    before do
+      # Setup a fakeldap server with ldap_backend data
+      ldap_backend = @ldap_backend_user.backends[0]
+      @server = FakeLDAP::Server.new(port: ldap_backend.port, base: ldap_backend.base)
+      # Add ldap_backend_user to it
+      @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}")
+    end
+
     it 'finds existing user based on cn' do
       skip 'TODO: Need fakeldap and setup here'
     end
