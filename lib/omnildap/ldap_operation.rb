@@ -15,6 +15,7 @@ module Omnildap
         entry['mail'] = u.email
         @hash["cn=#{u.name},#{@basedn}"] = entry
       end
+      # FIXME: Extend @hash with all users from backends
     end
 
     def simple_bind(version, dn, password)

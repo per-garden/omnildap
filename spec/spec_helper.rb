@@ -2,7 +2,6 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require 'database_cleaner'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -65,14 +64,5 @@ RSpec.configure do |config|
 
   RSpec.configure do |config|
     config.include Devise::TestHelpers, :type => :controller
-  end
-
-  config.before(:each, :database) do
-    # open transaction
-    DatabaseCleaner.start
-  end
-
-  config.after(:each, :database) do
-    DatabaseCleaner.clean
   end
 end
