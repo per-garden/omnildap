@@ -1,5 +1,4 @@
 class DeviseBackend < Backend
-  validates_absence_of :port, :base
   after_initialize :init
 
   private
