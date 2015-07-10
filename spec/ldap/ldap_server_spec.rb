@@ -3,9 +3,9 @@ require 'sidekiq/testing'
 
 describe Omnildap::LdapServer do
   before do
-    @user = FactoryGirl.build :user, admin: false
+    @user = FactoryGirl.build(:user)
     @user.save!
-    @admin = FactoryGirl.build :user, admin: true
+    @admin = FactoryGirl.build(:admin)
     @admin.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare

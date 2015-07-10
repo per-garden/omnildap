@@ -6,5 +6,10 @@ FactoryGirl.define do
     password_confirmation password
     name { Faker::Name.name }    
     backends [FactoryGirl.build(:devise_backend)]
+    admin false
+
+    factory :admin do
+      admin true
+    end
   end
 end
