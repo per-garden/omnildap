@@ -11,9 +11,5 @@ FactoryGirl.define do
     factory :admin do
       admin true
     end
-
-    factory :ldap_backend_user do
-      backends [FactoryGirl.build(:ldap_backend)]
-    end
   end
 end

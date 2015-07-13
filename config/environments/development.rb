@@ -40,7 +40,7 @@ Rails.application.configure do
     :port                   => 1389,
     :nodelay                => true,
     :listen                 => 10,
-    :operation_class        => HashOperation,
+    :operation_class        => Omnildap::LdapOperation,
     :operation_args         => [],
   }
   config.ldap_basedn = 'dc=omnildap'

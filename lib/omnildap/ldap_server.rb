@@ -5,7 +5,6 @@ module Omnildap
     def self.start
       unless @@server
         params = Rails.application.config.ldap_server
-        params[:operation_class] = Omnildap::LdapOperation
         @@server = LDAP::Server.new(params)
         @@server.run_tcpserver
         message = 'Started listening on port ' + "#{Rails.application.config.ldap_server[:port]}"

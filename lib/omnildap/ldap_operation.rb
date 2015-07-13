@@ -15,7 +15,15 @@ module Omnildap
         entry['mail'] = u.email
         @hash["cn=#{u.name},#{@basedn}"] = entry
       end
-      # FIXME: Extend @hash with all users from backends
+      # FIXME: Methods, find_by_ldap, all_by_ldap etc
+      LdapBackend.all.each do |b|
+        b.users.each do |u|
+          entry = {}
+          entry['cn'] = u.name
+          entry['mail'] = u.email
+          @hash["cn=#{u.name},#{@basedn}"] = entry
+        end
+      end
     end
 
     def simple_bind(version, dn, password)

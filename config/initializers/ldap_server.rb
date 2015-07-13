@@ -1,6 +1,9 @@
 if !$rails_rake_task
-  LdapWorker.prepare
-  LdapWorker.perform_async
+  # When testing we need to inline sidekiq
+  unless Rails.env.test?
+    LdapWorker.prepare
+    LdapWorker.perform_async
+  end
 
   # Stop (triggered by stopping rails app itself, i.e. ctrl-c)
   at_exit do

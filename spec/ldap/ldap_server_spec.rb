@@ -7,7 +7,10 @@ describe Omnildap::LdapServer do
     @user.save!
     @admin = FactoryGirl.build(:admin)
     @admin.save!
-    @ldap_backend_user = FactoryGirl.build(:ldap_backend_user)
+    @ldap_backend_user = FactoryGirl.build(:user)
+    @ldap_backend = FactoryGirl.build(:ldap_backend)
+    @ldap_backend.users << @ldap_backend_user
+    @ldap_backend.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
       LdapWorker.perform_async
@@ -57,10 +60,9 @@ describe Omnildap::LdapServer do
     end
 
     it 'finds existing user based on cn' do
-      skip 'This works. BUT should bind as admin + search for backend user'
       @client.authenticate(@admin.name, @admin.password)
-      # @client.bind.should be_truthy
-      base = "cn=#{@admin.name},#{Rails.application.config.ldap_basedn}"
+      @client.bind.should be_truthy
+      base = "cn=#{@ldap_backend_user.name},#{Rails.application.config.ldap_basedn}"
       filter = Net::LDAP::Filter.eq( :objectclass, '*' )
       expect(@client.search(base: base, filter: filter)).not_to be_empty
     end
