@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150709101948) do
+ActiveRecord::Schema.define(version: 20150714083508) do
 
   create_table "backends", force: true do |t|
     t.string   "name"
@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 20150709101948) do
     t.integer  "port"
     t.string   "base"
     t.string   "type"
+    t.string   "admin_name"
+    t.string   "admin_password"
   end
 
   create_table "backends_users", id: false, force: true do |t|

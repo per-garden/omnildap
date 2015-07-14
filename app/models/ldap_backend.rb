@@ -13,10 +13,25 @@ class LdapBackend < Backend
     end
   end
 
+  def find_user_by_ldap(criteria, login)
+    begin
+      filter = Net::LDAP::Filter.eq(criteria,login)
+      authenticate
+      @ldap.search(base: "#{base}", filter: filter)
+    rescue
+      # TODO: Logging of backend problems
+    end
+  end
+
   private
 
   def init
     self.host ||= 'localhost'
     self.port ||= 10389
+    @ldap = Net::LDAP.new(host: host, port: port, base: base)
+  end
+
+  def authenticate
+    @ldap.authenticate(admin_name, admin_password) ? @ldap.bind : false
   end
 end

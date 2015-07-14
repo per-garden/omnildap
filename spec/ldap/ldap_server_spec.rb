@@ -7,11 +7,6 @@ describe Omnildap::LdapServer do
     @user.save!
     @admin = FactoryGirl.build(:admin)
     @admin.save!
-    @ldap_backend_user = FactoryGirl.build(:user)
-    # FIXME: Use fakeldap and not direct backend creation
-    @ldap_backend = FactoryGirl.build(:ldap_backend)
-    @ldap_backend.users << @ldap_backend_user
-    @ldap_backend.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
       LdapWorker.perform_async
@@ -54,26 +49,45 @@ describe Omnildap::LdapServer do
 
   describe 'using ldap backend' do
     before do
-      @ldap_backend = @ldap_backend_user.backends[0]
+      @ldap_backend_user = FactoryGirl.build(:user)
+      @ldap_backend = FactoryGirl.build(:ldap_backend)
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
+      @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}")
       @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
+      # TODO: Make filtering work properly
+      @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
     end
 
     it 'finds registered user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
       base = "cn=#{@ldap_backend_user.name},#{Rails.application.config.ldap_basedn}"
-      filter = Net::LDAP::Filter.eq( :objectclass, '*' )
-      expect(@client.search(base: base, filter: filter)).not_to be_empty
+      name = @user.name
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:cn][0]
+      end
+      # FIXME: Expect @ldap_backend_user.email
+      expect(result).to include("#{@user.name}")
     end
 
     it 'finds registered user based on email' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
       base = "mail=#{@ldap_backend_user.email},#{Rails.application.config.ldap_basedn}"
-      filter = Net::LDAP::Filter.eq( :objectclass, '*' )
-      expect(@client.search(base: base, filter: filter)).not_to be_empty
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:mail][0]
+      end
+      # FIXME: Expect @ldap_backend_user.email
+      expect(result).to include("#{@user.email}")
+    end
+
+    after do
+      @server.stop
     end
   end
 
