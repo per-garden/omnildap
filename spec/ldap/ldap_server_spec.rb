@@ -8,6 +8,7 @@ describe Omnildap::LdapServer do
     @admin = FactoryGirl.build(:admin)
     @admin.save!
     @ldap_backend_user = FactoryGirl.build(:user)
+    # FIXME: Use fakeldap and not direct backend creation
     @ldap_backend = FactoryGirl.build(:ldap_backend)
     @ldap_backend.users << @ldap_backend_user
     @ldap_backend.save!
@@ -59,10 +60,18 @@ describe Omnildap::LdapServer do
       @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
     end
 
-    it 'finds existing user based on cn' do
+    it 'finds registered user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
       base = "cn=#{@ldap_backend_user.name},#{Rails.application.config.ldap_basedn}"
+      filter = Net::LDAP::Filter.eq( :objectclass, '*' )
+      expect(@client.search(base: base, filter: filter)).not_to be_empty
+    end
+
+    it 'finds registered user based on email' do
+      @client.authenticate(@admin.name, @admin.password)
+      @client.bind.should be_truthy
+      base = "mail=#{@ldap_backend_user.email},#{Rails.application.config.ldap_basedn}"
       filter = Net::LDAP::Filter.eq( :objectclass, '*' )
       expect(@client.search(base: base, filter: filter)).not_to be_empty
     end
