@@ -38,6 +38,7 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   config.ldap_server = {
+    :host                   => 'localhost',
     :port                   => 1389,
     :nodelay                => true,
     :listen                 => 10,

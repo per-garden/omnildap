@@ -13,14 +13,18 @@ class LdapBackend < Backend
     end
   end
 
-  def find_user_by_ldap(criteria, login)
-    begin
-      filter = Net::LDAP::Filter.eq(criteria,login)
-      authenticate
-      @ldap.search(base: "#{base}", filter: filter)
-    rescue
-      # TODO: Logging of backend problems
+  def find_users_by_ldap
+    if authenticate
+      result = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)")
     end
+    result || []
+  end
+
+  def find_groups_by_ldap
+    if authenticate
+      result = @ldap.search(base: base, filter: "(objectClass=groupofnames)")
+    end
+    result || []
   end
 
   private

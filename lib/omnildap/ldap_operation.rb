@@ -15,15 +15,6 @@ module Omnildap
         entry['mail'] = u.email
         @hash["cn=#{u.name},#{@basedn}"] = entry
       end
-      # FIXME: Methods, find_by_ldap, all_by_ldap etc
-      LdapBackend.all.each do |b|
-        b.users.each do |u|
-          entry = {}
-          entry['cn'] = u.name
-          entry['mail'] = u.email
-          @hash["cn=#{u.name},#{@basedn}"] = entry
-        end
-      end
     end
 
     def simple_bind(version, dn, password)
@@ -53,6 +44,14 @@ module Omnildap
     def search(basedn, scope, deref, filter = [:true])
       basedn.downcase!
 
+      LdapBackend.all.each do |b|
+        b.find_users_by_ldap.each do |lu|
+          entry = {}
+          entry['cn'] = lu[:cn][0]
+          entry['mail'] = lu[:mail][0]
+          @hash["cn=#{lu[:cn][0]},#{@basedn}"] = entry
+        end
+      end
       # Scope base, one, sub or children, specifying base object, one-level,
       # or subtree search (children requires LDAPv3 subordinate feature extension)
       # (http://www.zytrax.com/books/ldap/ch14/#ldapsearch)

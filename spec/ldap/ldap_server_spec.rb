@@ -51,6 +51,7 @@ describe Omnildap::LdapServer do
     before do
       @ldap_backend_user = FactoryGirl.build(:user)
       @ldap_backend = FactoryGirl.build(:ldap_backend)
+      @ldap_backend.save!
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}")
@@ -62,28 +63,26 @@ describe Omnildap::LdapServer do
     it 'finds registered user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
-      base = "cn=#{@ldap_backend_user.name},#{Rails.application.config.ldap_basedn}"
-      name = @user.name
+      base = "#{Rails.application.config.ldap_basedn}"
       entries = @client.search(base: base, filter: @filter)
       result = []
       entries.each do |e|
         result << e[:cn][0]
       end
-      # FIXME: Expect @ldap_backend_user.email
-      expect(result).to include("#{@user.name}")
+      expect(result).to include("#{@ldap_backend_user.name}")
     end
 
     it 'finds registered user based on email' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
-      base = "mail=#{@ldap_backend_user.email},#{Rails.application.config.ldap_basedn}"
+      base = "#{Rails.application.config.ldap_basedn}"
       entries = @client.search(base: base, filter: @filter)
       result = []
       entries.each do |e|
         result << e[:mail][0]
       end
       # FIXME: Expect @ldap_backend_user.email
-      expect(result).to include("#{@user.email}")
+      expect(result).to include("#{@ldap_backend_user.email}")
     end
 
     after do
