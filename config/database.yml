@@ -7,7 +7,7 @@
 default: &default
   adapter: sqlite3
   # Extended pool since both rails web and ldap server
-  pool: 15
+  pool: 25
   timeout: 5000
 
 development:

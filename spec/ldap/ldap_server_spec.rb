@@ -78,8 +78,13 @@ describe Omnildap::LdapServer do
       expect(result).to include("#{@ldap_backend_user.email}")
     end
 
-    it "passes authentication for existing user" do
+    it "passes authentication for existing user based on name" do
       @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
+      @client.bind.should be_truthy
+    end
+
+    it "passes authentication for existing user based on email" do
+      @client.authenticate("#{@ldap_backend_user.email}", "#{@ldap_backend_user.password}")
       @client.bind.should be_truthy
     end
 
