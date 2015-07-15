@@ -89,7 +89,12 @@ describe Omnildap::LdapServer do
     end
 
     it "fails authentication for non-existing user" do
-      @client.authenticate("not_#{@ldap_backend_user.name}", @ldap_backend_user.password)
+      @client.authenticate("not_#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
+      @client.bind.should be_falsey
+    end
+
+    it "fails authentication with invalid credentials" do
+      @client.authenticate("#{@ldap_backend_user.name}", "not_#{@ldap_backend_user.password}")
       @client.bind.should be_falsey
     end
 
