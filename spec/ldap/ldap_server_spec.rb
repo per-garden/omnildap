@@ -60,7 +60,7 @@ describe Omnildap::LdapServer do
       @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
     end
 
-    it 'finds registered user based on cn' do
+    it 'finds backend user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
       base = "#{Rails.application.config.ldap_basedn}"
@@ -72,7 +72,7 @@ describe Omnildap::LdapServer do
       expect(result).to include("#{@ldap_backend_user.name}")
     end
 
-    it 'finds registered user based on email' do
+    it 'finds backend user based on email' do
       @client.authenticate(@admin.name, @admin.password)
       @client.bind.should be_truthy
       base = "#{Rails.application.config.ldap_basedn}"
@@ -81,8 +81,19 @@ describe Omnildap::LdapServer do
       entries.each do |e|
         result << e[:mail][0]
       end
-      # FIXME: Expect @ldap_backend_user.email
       expect(result).to include("#{@ldap_backend_user.email}")
+    end
+
+    it 'passes authentication for existing user' do
+      skip 'passes authentication for existing user'
+      @client.authenticate(@ldap_backend_user.name, @ldap_backend_user.password)
+      @client.bind.should be_truthy
+    end
+
+    it 'fails authentication for non-existing user' do
+      skip 'fails authentication for non-existing user'
+      @client.authenticate('not_' + "#{@ldap_backend_user.name}", @ldap_backend_user.password)
+      @client.bind.should be_falsey
     end
 
     after do
