@@ -14,17 +14,21 @@ class LdapBackend < Backend
   end
 
   def find_users_by_ldap
-    if authenticate
+    if admin_authenticate
       result = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)")
     end
     result || []
   end
 
   def find_groups_by_ldap
-    if authenticate
+    if admin_authenticate
       result = @ldap.search(base: base, filter: "(objectClass=groupofnames)")
     end
     result || []
+  end
+
+  def authenticate(name, password)
+    @ldap.authenticate(name, password) ? @ldap.bind : false
   end
 
   private
@@ -35,7 +39,7 @@ class LdapBackend < Backend
     @ldap = Net::LDAP.new(host: host, port: port, base: base)
   end
 
-  def authenticate
+  def admin_authenticate
     @ldap.authenticate(admin_name, admin_password) ? @ldap.bind : false
   end
 end

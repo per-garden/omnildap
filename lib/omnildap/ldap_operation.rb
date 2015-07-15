@@ -24,19 +24,15 @@ module Omnildap
       unless (dn && dn[0])
         raise LDAP::ResultError::InappropriateAuthentication, "Missing bind credentials. Expecting name/email, password"
       else
-        # FIXME: Must use backend here too
         if dn.include?('@')
-          u = User.find_by_email(dn)
+          u = User.find_by_email(dn) || find_user_by_ldap(:mail, dn)
         else
-          u = User.find_by_name(dn)
+          u = User.find_by_name(dn) || find_user_by_ldap(:cn, dn)
         end
         unless u
           raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
         end
-        unless u && u.admin
-          raise LDAP::ResultError::InappropriateAuthentication, 'Binding user must be admin'
-        end
-        unless u && u.valid_password?(password)
+        unless u && (u.valid_bind?(password) || u.valid_password?(password))
           raise LDAP::ResultError::InvalidCredentials
         end
       end
@@ -83,6 +79,22 @@ module Omnildap
         end
       end
       result
+    end
+
+    def find_user_by_ldap(criteria, login)
+      u = nil
+      LdapBackend.all.each do |b|
+        b.find_users_by_ldap.each do |lu|
+          if lu[criteria][0] == login
+            unless u
+              u = User.new(name: lu['cn'][0], email: lu['mail'][0], backends: [b], admin: false)
+            else
+              u.backends << b
+            end
+          end
+        end
+      end
+      u
     end
 
   end
