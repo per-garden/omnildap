@@ -8,13 +8,9 @@ module Omnildap
     def initialize(connection, messageID, hash = {})
       super(connection, messageID)
       @basedn = Rails.application.config.ldap_basedn
+      sync_with_backends
       @hash = hash
-      User.all.each do |u|
-        entry = {}
-        entry['cn'] = u.name
-        entry['mail'] = u.email
-        @hash["cn=#{u.name},#{@basedn}"] = entry
-      end
+      @hash.merge!(find_users)
     end
 
     def simple_bind(version, dn, password)
@@ -41,7 +37,7 @@ module Omnildap
     def search(basedn, scope, deref, filter = [:true])
       basedn.downcase!
 
-      @hash.merge!(find_users)
+      # @hash.merge!(find_users)
       # Scope base, one, sub or children, specifying base object, one-level,
       # or subtree search (children requires LDAPv3 subordinate feature extension)
       # (http://www.zytrax.com/books/ldap/ch14/#ldapsearch)
@@ -68,33 +64,41 @@ module Omnildap
   
     private
 
+    def sync_with_backends
+      # TODO: Two separete hashes, keyed on name, and email => faster fetch
+      @users = {}
+      Backend.all.each do |b|
+        b.find_users.each do |bu|
+          # Keyed on [name, email]
+          u = @users[[bu[:cn][0], bu[:mail][0]]]
+          unless u
+            u = User.new(name: bu[:cn][0], email: bu[:mail][0], backends: [b])
+            @users[[bu[:cn][0], bu[:mail][0]]] = u
+          else
+            u.backends << b
+          end
+        end
+      end
+    end
+
     def find_users
       result = {}
-      Backend.all.each do |b|
-        b.find_users.each do |lu|
-          entry = {}
-          entry['cn'] = lu[:cn][0]
-          entry['mail'] = lu[:mail][0]
-          result["cn=#{lu[:cn][0]},#{@basedn}"] = entry
-        end
+      @users.values.each do |u|
+        entry = {}
+        entry['cn'] = u.name
+        entry['mail'] = u.email
+        result["cn=#{u.name},#{@basedn}"] = entry
       end
       result
     end
 
     def find_user(criteria, login)
-      u = nil
-      Backend.all.each do |b|
-        b.find_users.each do |lu|
-          if lu[criteria][0] == login
-            unless u
-              u = User.new(name: lu[:cn][0], email: lu[:mail][0], backends: [b])
-            else
-              u.backends << b
-            end
-          end
-        end
+      case criteria
+      when :cn
+        (@users.values.select {|u| u.name == login})[0]
+      when :mail
+        (@users.values.select {|u| u.email == login})[0]
       end
-      u
     end
 
   end
