@@ -3,9 +3,10 @@ require 'sidekiq/testing'
 
 describe Omnildap::LdapServer do
   before do
-    @user = FactoryGirl.build(:user)
-    @user.save!
+    @devise_backend = FactoryGirl.build(:devise_backend)
+    @devise_backend.save!
     @admin = FactoryGirl.build(:admin)
+    @admin.backends << @devise_backend
     @admin.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
@@ -14,31 +15,38 @@ describe Omnildap::LdapServer do
     @client = Net::LDAP.new
     @client.port = Rails.application.config.ldap_server[:port]
   end
-
-  # FIXME: Why has functioning here changed all of a sudden?
-  describe "when receiving bind request it" do
-    it "responds with Inappropriate Authentication if anonymous" do
-      # @client.bind.should be_falsey
-      # @client.get_operation_result.code.should == 48
-      @client.get_operation_result.code.should == 0
+  
+  describe 'using devise backend' do
+    before do
+      @user = FactoryGirl.build(:user)
+      @user.backends << @devise_backend
+      @user.save!
     end
 
-    it "responds with Invalid Credentials if admin credentials are incorrect" do
-      @client.authenticate(@admin.name, 'not_' + @admin.password)
-      @client.bind.should be_falsey
-    end
+    # FIXME: Why has functioning here changed all of a sudden?
+    describe "when receiving bind request it" do
+      it "responds with Inappropriate Authentication if anonymous" do
+        # @client.bind.should be_falsey
+        # @client.get_operation_result.code.should == 48
+        @client.get_operation_result.code.should == 0
+      end
 
-    it "responds with bind result error if admin does not exist" do
-      @client.authenticate('not_' + @admin.name, @admin.password)
-      # Expecting Net::LDAP::NoBindResultError
-      @client.get_operation_result.code.should == 0
-    end
+      it "responds with Invalid Credentials if admin credentials are incorrect" do
+        @client.authenticate(@admin.name, 'not_' + @admin.password)
+        @client.bind.should be_falsey
+      end
 
-    it "responds affirmatively if admin, and correct correct credentials" do
-      @client.authenticate(@admin.name, @admin.password)
-      @client.bind.should be_truthy
-    end
+      it "responds with bind result error if admin does not exist" do
+        @client.authenticate('not_' + @admin.name, @admin.password)
+        # Expecting Net::LDAP::NoBindResultError
+        @client.get_operation_result.code.should == 0
+      end
 
+      it "responds affirmatively if admin, and correct correct credentials" do
+        @client.authenticate(@admin.name, @admin.password)
+        @client.bind.should be_truthy
+      end
+    end
   end
 
   describe 'using ldap backend' do
@@ -108,5 +116,4 @@ describe Omnildap::LdapServer do
     User.destroy_all
     Backend.destroy_all
   end
-
 end
