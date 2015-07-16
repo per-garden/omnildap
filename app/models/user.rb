@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   validates_presence_of :name, :email
   has_and_belongs_to_many :backends
   validates_presence_of :backends, :message => 'must not be empty'
+  after_initialize :init
 
   def valid_bind?(password)
     result = false
@@ -13,5 +14,11 @@ class User < ActiveRecord::Base
       result ||= b.authenticate(name, password)
     end
     result
+  end
+
+  private
+
+  def init
+    self.admin ||= false
   end
 end

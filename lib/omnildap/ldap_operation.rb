@@ -87,7 +87,7 @@ module Omnildap
         b.find_users_by_ldap.each do |lu|
           if lu[criteria][0] == login
             unless u
-              u = User.new(name: lu['cn'][0], email: lu['mail'][0], backends: [b], admin: false)
+              u = User.new(name: lu['cn'][0], email: lu['mail'][0], backends: [b])
             else
               u.backends << b
             end
