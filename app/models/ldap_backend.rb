@@ -13,7 +13,7 @@ class LdapBackend < Backend
     end
   end
 
-  def find_users_by_ldap
+  def find_users
     if admin_authenticate
       result = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)")
     end
