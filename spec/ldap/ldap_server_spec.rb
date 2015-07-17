@@ -8,8 +8,6 @@ describe Omnildap::LdapServer do
     @admin = FactoryGirl.build(:admin)
     @admin.backends << @devise_backend
     @admin.save!
-    @blocked_user = FactoryGirl.build(:blocked_user)
-    @blocked_user.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
       LdapWorker.perform_async
@@ -23,6 +21,9 @@ describe Omnildap::LdapServer do
       @user = FactoryGirl.build(:user)
       @user.backends << @devise_backend
       @user.save!
+      @blocked_user = FactoryGirl.build(:blocked_user)
+      @blocked_user.backends << @devise_backend
+      @blocked_user.save!
     end
 
     describe "when receiving bind request it" do
@@ -53,8 +54,11 @@ describe Omnildap::LdapServer do
 
       it "fails authentication for blocked user" do
         skip "fails authentication for blocked user"
+        @client.authenticate("#{@blocked_user.name}", "#{@blocked_user.password}")
+        @client.bind.should be_falsey
       end
     end
+
   end
 
   describe 'using ldap backend' do
@@ -62,10 +66,12 @@ describe Omnildap::LdapServer do
       @ldap_backend_user = FactoryGirl.build(:user)
       @ldap_backend = FactoryGirl.build(:ldap_backend)
       @ldap_backend.save!
+      @blocked_ldap_backend_user = FactoryGirl.build(:blocked_user)
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}")
       @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
+      @server.add_user("#{@blocked_ldap_backend_user.name}" ,"#{@blocked_ldap_backend_user.password}", "#{@blocked_ldap_backend_user.email}")
       # TODO: Make filtering work properly
       @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
     end

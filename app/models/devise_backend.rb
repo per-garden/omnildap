@@ -2,15 +2,7 @@ class DeviseBackend < Backend
   after_initialize :init
 
   def find_users
-    users = []
-    User.all.each do |u|
-      entry = {}
-      entry[:dn] = [u.name]
-      entry[:cn] = [u.name]
-      entry[:mail] = [u.email]
-      users << entry
-    end
-    users
+    User.all
   end
 
   def authenticate(name, password)

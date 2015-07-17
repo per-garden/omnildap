@@ -28,7 +28,7 @@ module Omnildap
         unless u
           raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
         end
-        unless u && u.valid_bind?(password)
+        unless u && !u.blocked && u.valid_bind?(password)
           raise LDAP::ResultError::InvalidCredentials
         end
       end
@@ -68,14 +68,13 @@ module Omnildap
       @emails = {}
       Backend.all.each do |b|
         b.find_users.each do |bu|
-          u = @users[[bu[:cn][0]]]
+          u = @users[[bu.name]]
           unless u
-            u = User.new(name: bu[:cn][0], email: bu[:mail][0], backends: [b])
-            @users[[bu[:cn][0]]] = u
-            @emails[[bu[:mail][0]]] = u
-          else
-            u.backends << b
+            u = bu.dup
+            @users[[bu.name]] = u
+            @emails[[bu.email]] = u
           end
+          u.backends << b
         end
       end
     end

@@ -14,10 +14,14 @@ class LdapBackend < Backend
   end
 
   def find_users
+    result = []
     if admin_authenticate
-      result = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)")
+      backend_users = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)")
+      backend_users.each do |bu|
+        result << User.new(name: bu[:cn][0], email: bu[:mail][0], backends: [self])
+      end
     end
-    result || []
+    result
   end
 
   def find_groups_by_ldap
