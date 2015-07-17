@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 20150717090308) do
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.string   "name"
-    t.boolean  "admin",
+    t.boolean  "admin"
     t.boolean  "blocked"
   end
 
