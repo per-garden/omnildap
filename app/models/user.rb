@@ -20,5 +20,6 @@ class User < ActiveRecord::Base
 
   def init
     self.admin ||= false
+    self.blocked ||= false
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150714083508) do
+ActiveRecord::Schema.define(version: 20150717090308) do
 
   create_table "backends", force: true do |t|
     t.string   "name"
@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 20150714083508) do
     t.string   "last_sign_in_ip"
     t.string   "name"
     t.boolean  "admin",                  default: false
+    t.boolean  "blocked"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

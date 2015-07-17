@@ -8,6 +8,8 @@ describe Omnildap::LdapServer do
     @admin = FactoryGirl.build(:admin)
     @admin.backends << @devise_backend
     @admin.save!
+    @blocked_user = FactoryGirl.build(:blocked_user)
+    @blocked_user.save!
     Sidekiq::Testing.inline! do
       LdapWorker.prepare
       LdapWorker.perform_async
@@ -23,28 +25,34 @@ describe Omnildap::LdapServer do
       @user.save!
     end
 
-    # FIXME: Why has functioning here changed all of a sudden?
     describe "when receiving bind request it" do
       it "responds with Inappropriate Authentication if anonymous" do
-        # @client.bind.should be_falsey
-        # @client.get_operation_result.code.should == 48
-        @client.get_operation_result.code.should == 0
+        @client.bind.should be_falsey
+        @client.get_operation_result.code.should == 48
       end
 
-      it "responds with Invalid Credentials if admin credentials are incorrect" do
-        @client.authenticate(@admin.name, 'not_' + @admin.password)
+      it "passes authentication for existing user based on name" do
+        @client.authenticate("#{@user.name}", "#{@user.password}")
+        @client.bind.should be_truthy
+      end
+
+      it "passes authentication for existing user based on email" do
+        @client.authenticate("#{@user.email}", "#{@user.password}")
+        @client.bind.should be_truthy
+      end
+
+      it "fails authentication for non-existing user" do
+        @client.authenticate("not_#{@user.name}", "#{@user.password}")
         @client.bind.should be_falsey
       end
 
-      it "responds with bind result error if admin does not exist" do
-        @client.authenticate('not_' + @admin.name, @admin.password)
-        # Expecting Net::LDAP::NoBindResultError
-        @client.get_operation_result.code.should == 0
+      it "fails authentication with invalid credentials" do
+        @client.authenticate("#{@user.name}", "not_#{@user.password}")
+        @client.bind.should be_falsey
       end
 
-      it "responds affirmatively if admin, and correct correct credentials" do
-        @client.authenticate(@admin.name, @admin.password)
-        @client.bind.should be_truthy
+      it "fails authentication for blocked user" do
+        skip "fails authentication for blocked user"
       end
     end
   end
@@ -60,6 +68,32 @@ describe Omnildap::LdapServer do
       @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
       # TODO: Make filtering work properly
       @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
+    end
+
+    describe "when receiving bind request it" do
+      it "passes authentication for existing user based on name" do
+        @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
+        @client.bind.should be_truthy
+      end
+
+      it "passes authentication for existing user based on email" do
+        @client.authenticate("#{@ldap_backend_user.email}", "#{@ldap_backend_user.password}")
+        @client.bind.should be_truthy
+      end
+
+      it "fails authentication for non-existing user" do
+        @client.authenticate("not_#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
+        @client.bind.should be_falsey
+      end
+
+      it "fails authentication with invalid credentials" do
+        @client.authenticate("#{@ldap_backend_user.name}", "not_#{@ldap_backend_user.password}")
+        @client.bind.should be_falsey
+      end
+
+      it "fails authentication for blocked user" do
+        skip "fails authentication for blocked user"
+      end
     end
 
     it 'finds backend user based on cn' do
@@ -84,26 +118,6 @@ describe Omnildap::LdapServer do
         result << e[:mail][0]
       end
       expect(result).to include("#{@ldap_backend_user.email}")
-    end
-
-    it "passes authentication for existing user based on name" do
-      @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
-      @client.bind.should be_truthy
-    end
-
-    it "passes authentication for existing user based on email" do
-      @client.authenticate("#{@ldap_backend_user.email}", "#{@ldap_backend_user.password}")
-      @client.bind.should be_truthy
-    end
-
-    it "fails authentication for non-existing user" do
-      @client.authenticate("not_#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
-      @client.bind.should be_falsey
-    end
-
-    it "fails authentication with invalid credentials" do
-      @client.authenticate("#{@ldap_backend_user.name}", "not_#{@ldap_backend_user.password}")
-      @client.bind.should be_falsey
     end
 
     after do
