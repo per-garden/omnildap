@@ -58,6 +58,23 @@ describe Omnildap::LdapServer do
       end
     end
 
+    describe 'when backend blocked' do
+      before do
+        @devise_backend.blocked = true
+        @devise_backend.save!
+      end
+
+      it "fails authentication" do
+        @client.authenticate("#{@user.name}", "#{@user.password}")
+        @client.bind.should be_falsey
+      end
+
+      after do
+        @devise_backend.blocked = false
+        @devise_backend.save!
+      end
+    end
+
   end
 
   describe 'using ldap backend' do
@@ -117,6 +134,23 @@ describe Omnildap::LdapServer do
         result << e[:mail][0]
       end
       expect(result).to include("#{@ldap_backend_user.email}")
+    end
+
+    describe 'when backend blocked' do
+      before do
+        @ldap_backend.blocked = true
+        @ldap_backend.save!
+      end
+
+      it "fails authentication" do
+        @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
+        @client.bind.should be_falsey
+      end
+
+      after do
+        @ldap_backend.blocked = false
+        @ldap_backend.save!
+      end
     end
 
     after do

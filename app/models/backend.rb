@@ -12,9 +12,8 @@ class Backend < ActiveRecord::Base
     false
   end
 
-  # Abstactly mimicking ldap by giving empty hash
   def find_users
-    {}
+    []
   end
 
   private

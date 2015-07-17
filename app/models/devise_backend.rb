@@ -2,7 +2,7 @@ class DeviseBackend < Backend
   after_initialize :init
 
   def find_users
-    User.all
+    blocked ? [] : User.all
   end
 
   def authenticate(name, password)

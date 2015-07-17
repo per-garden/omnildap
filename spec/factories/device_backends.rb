@@ -1,6 +1,10 @@
 FactoryGirl.define do
   factory :devise_backend do
-    name Faker::Company.name
+    sequence(:name) { Faker::Company.name }
+
+    factory :blocked_backend do
+      blocked true
+    end
   end
 
 end
