@@ -21,9 +21,9 @@ module Omnildap
         raise LDAP::ResultError::InappropriateAuthentication, "Missing bind credentials. Expecting name/email, password"
       else
         if dn.include?('@')
-          u = find_user(:mail, dn)
+          u = @emails[[dn]]
         else
-          u = find_user(:cn, dn)
+          u = @users[[dn]]
         end
         unless u
           raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
@@ -37,7 +37,6 @@ module Omnildap
     def search(basedn, scope, deref, filter = [:true])
       basedn.downcase!
 
-      # @hash.merge!(find_users)
       # Scope base, one, sub or children, specifying base object, one-level,
       # or subtree search (children requires LDAPv3 subordinate feature extension)
       # (http://www.zytrax.com/books/ldap/ch14/#ldapsearch)
@@ -65,15 +64,15 @@ module Omnildap
     private
 
     def sync_with_backends
-      # TODO: Two separete hashes, keyed on name, and email => faster fetch
       @users = {}
+      @emails = {}
       Backend.all.each do |b|
         b.find_users.each do |bu|
-          # Keyed on [name, email]
-          u = @users[[bu[:cn][0], bu[:mail][0]]]
+          u = @users[[bu[:cn][0]]]
           unless u
             u = User.new(name: bu[:cn][0], email: bu[:mail][0], backends: [b])
-            @users[[bu[:cn][0], bu[:mail][0]]] = u
+            @users[[bu[:cn][0]]] = u
+            @emails[[bu[:mail][0]]] = u
           else
             u.backends << b
           end
@@ -90,15 +89,6 @@ module Omnildap
         result["cn=#{u.name},#{@basedn}"] = entry
       end
       result
-    end
-
-    def find_user(criteria, login)
-      case criteria
-      when :cn
-        (@users.values.select {|u| u.name == login})[0]
-      when :mail
-        (@users.values.select {|u| u.email == login})[0]
-      end
     end
 
   end
