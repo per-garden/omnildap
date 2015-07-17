@@ -53,7 +53,6 @@ describe Omnildap::LdapServer do
       end
 
       it "fails authentication for blocked user" do
-        skip "fails authentication for blocked user"
         @client.authenticate("#{@blocked_user.name}", "#{@blocked_user.password}")
         @client.bind.should be_falsey
       end
@@ -66,12 +65,10 @@ describe Omnildap::LdapServer do
       @ldap_backend_user = FactoryGirl.build(:user)
       @ldap_backend = FactoryGirl.build(:ldap_backend)
       @ldap_backend.save!
-      @blocked_ldap_backend_user = FactoryGirl.build(:blocked_user)
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}")
       @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
-      @server.add_user("#{@blocked_ldap_backend_user.name}" ,"#{@blocked_ldap_backend_user.password}", "#{@blocked_ldap_backend_user.email}")
       # TODO: Make filtering work properly
       @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
     end
@@ -95,10 +92,6 @@ describe Omnildap::LdapServer do
       it "fails authentication with invalid credentials" do
         @client.authenticate("#{@ldap_backend_user.name}", "not_#{@ldap_backend_user.password}")
         @client.bind.should be_falsey
-      end
-
-      it "fails authentication for blocked user" do
-        skip "fails authentication for blocked user"
       end
     end
 
