@@ -75,6 +75,23 @@ describe Omnildap::LdapServer do
       end
     end
 
+    describe 'with blocking email pattern' do
+      before do
+        @devise_backend.email_pattern = @user.email.gsub(/.*@/, '*@')
+        @devise_backend.save!
+      end
+
+      it "fails authentication for user not matching pattern" do
+        skip 'Blocked email patterns to be excluded'
+        @client.authenticate("#{@user.name}", "#{@user.password}")
+        @client.bind.should be_falsey
+      end
+
+      after do
+        @devise_backend.email_pattern = '*@*'
+        @devise_backend.save!
+      end
+    end
   end
 
   describe 'using ldap backend' do

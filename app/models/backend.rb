@@ -20,5 +20,6 @@ class Backend < ActiveRecord::Base
 
   def init
     backends ||= []
+    email_pattern ||= '.*@.*'
   end
 end

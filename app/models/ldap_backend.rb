@@ -23,6 +23,7 @@ class LdapBackend < Backend
         end
       end
     end
+    # TODO: Blocked email patterns to be excluded
     result
   end
 

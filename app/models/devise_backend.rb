@@ -2,6 +2,7 @@ class DeviseBackend < Backend
   after_initialize :init
 
   def find_users
+    # TODO: Blocked email patterns to be excluded
     blocked ? [] : User.all
   end
 
