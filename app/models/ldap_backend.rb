@@ -23,8 +23,7 @@ class LdapBackend < Backend
         end
       end
     end
-    # TODO: Blocked email patterns to be excluded
-    result
+    result.select { |u| u.email.match(/#{email_pattern}/)}
   end
 
   def find_groups_by_ldap

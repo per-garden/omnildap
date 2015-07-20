@@ -2,8 +2,7 @@ class DeviseBackend < Backend
   after_initialize :init
 
   def find_users
-    # TODO: Blocked email patterns to be excluded
-    blocked ? [] : User.all
+    blocked ? [] : User.all.select { |u| u.email.match(/#{email_pattern}/)}
   end
 
   def authenticate(name, password)
