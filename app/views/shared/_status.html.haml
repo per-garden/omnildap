@@ -1,0 +1,9 @@
+%h1
+  Omnildap
+  .content
+    %h3 #{current_user ? current_user.email : ''}
+    - unless current_user
+      = link_to "Login", new_user_session_path, class: 'btn btn-lg btn-create pull-left'
+      = link_to "Signup", new_user_registration_path, class: 'btn btn-lg btn-create pull-left'
+    - else
+      = link_to "Logout", destroy_user_session_path, :method => :delete, class: 'btn btn-lg btn-remove pull-left'

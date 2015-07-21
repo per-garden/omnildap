@@ -1,0 +1,2 @@
+class BackendsController < ApplicationController
+end
