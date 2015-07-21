@@ -1,11 +1,28 @@
-%b
-  %font{:size => "+1"}
-    Welcome #{current_user ? current_user.email : ''}
-%br/
-%br/
-= Time.now
-%p
-  - if current_user
-    %a{"data-method" => "delete", :href => "/users/sign_out", :rel => "nofollow"} Logout
-  - else
-    %a{:href => "/users/sign_in"} Login
+!!!
+%html{ lang: "en"}
+  %body
+    .section
+      .container
+        .row
+          .col-md-3
+            %h1
+              Omnildap
+              .content
+                %h3 Welcome #{current_user ? current_user.email : ''}
+                - unless current_user
+                  = link_to "Signup", new_user_registration_path, class: 'btn btn-lg btn-create pull-left'
+                  = link_to "Login", new_user_session_path, class: 'btn btn-lg btn-create pull-left'
+                - else
+                  = link_to "Logout", destroy_user_session_path, :method => :delete, class: 'btn btn-lg btn-remove pull-left'
+          - if current_user
+            .col-md-9
+              %form{:role => "form"}
+                .form-group
+                  %label.control-label{:for => "exampleInputEmail1"} Email address
+                  %input#exampleInputEmail1.form-control{:placeholder => "Enter email", :type => "email"}/
+                .form-group
+                  %label.control-label{:for => "exampleInputPassword1"} Password
+                  %input#exampleInputPassword1.form-control{:placeholder => "Password", :type => "password"}/
+                %button.btn.btn-default{:type => "submit"} Submit
+        .footer
+          = Time.now
