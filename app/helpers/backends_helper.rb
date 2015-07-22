@@ -4,6 +4,6 @@ module BackendsHelper
   end
 
   def name(backend)
-    backend.name || backend.id.to_s
+    backend.name.blank? ? backend.id.to_s : backend.name
   end
 end

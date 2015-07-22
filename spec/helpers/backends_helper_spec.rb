@@ -11,5 +11,29 @@ require 'spec_helper'
 #   end
 # end
 describe BackendsHelper do
-  pending "add some examples to (or delete) #{__FILE__}"
+  before do
+    @devise_backend = FactoryGirl.build(:devise_backend)
+    @devise_backend.save!
+    @nameless_backend = FactoryGirl.build(:devise_backend, name: nil)
+    @nameless_backend.save!
+    @nameless_backend1 = FactoryGirl.build(:devise_backend, name: '')
+  end
+
+  it 'lists backends' do
+    expect(helper.backend_all).to include(@devise_backend)
+  end
+
+  it 'returns name of named backend' do
+    expect(helper.name(@devise_backend)).to be == @devise_backend.name
+  end
+
+  it 'returns id as name if no name set' do
+    expect(helper.name(@nameless_backend)).to be == @nameless_backend.id.to_s
+    expect(helper.name(@nameless_backend1)).to be == @nameless_backend1.id.to_s
+  end
+
+  after do
+    @devise_backend.destroy
+    @nameless_backend.destroy
+  end
 end
