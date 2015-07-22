@@ -22,7 +22,7 @@
     .list-group-item
       %span.light #{backend.type.capitalize}:
       %strong
-        = link_to backend.name, backend_path(backend)
+        = link_to name(backend), backend_path(backend)
         .pull-right
           = link_to 'Edit', edit_backend_path(backend), class: "btn btn-sm"
           = link_to 'Delete', backend_path(backend), method: :delete, class: "btn btn-sm btn-remove"
