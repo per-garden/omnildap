@@ -1,5 +1,5 @@
 module BackendsHelper
-  def backends_all
+  def backend_all
     Backend.all
   end
 

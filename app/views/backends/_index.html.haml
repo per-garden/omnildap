@@ -1,0 +1,30 @@
+- @backends = backend_all
+.panel
+  .panel-heading
+    %h3.pull-left Backends (#{@backends.count})
+  .row
+    .dropdown.pull-right
+      %button.dropdown-toggle.btn.btn-sm.btn-success{type: 'button', 'data-toggle' => 'dropdown'}
+        New
+        %b.caret
+      %ul.dropdown-menu{:style => "right: 0; left: auto;"}
+        %li
+          = link_to new_backend_path(type: 'DeviseBackend') do
+            = 'DeviseBackend'
+        %li
+          = link_to new_backend_path(type: 'LdapBackend') do
+            = 'LdapBackend'
+        %li
+          = link_to new_backend_path(type: 'ActiveDirectoryBackend') do
+            = 'ActiveDirectoryBackend'
+%ul.list-group
+  - @backends.each do |backend|
+    .list-group-item
+      %span.light #{backend.type.capitalize}:
+      %strong
+        = link_to name(backend), backend_path(backend)
+        .pull-right
+          = link_to 'Edit', edit_backend_path(backend), class: "btn btn-sm"
+          = link_to 'Delete', backend_path(backend), method: :delete, class: "btn btn-sm btn-remove"
+  - if @backends.blank?
+    .nothing-here-block 0 backends matches
