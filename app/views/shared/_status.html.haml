@@ -1,9 +1,17 @@
-%h1
-  Omnildap
-  .content
-    %h3 #{current_user ? current_user.email : ''}
-    - unless current_user
-      = link_to "Login", new_user_session_path, class: 'btn btn-lg btn-create pull-left'
-      = link_to "Signup", new_user_registration_path, class: 'btn btn-lg btn-create pull-left'
-    - else
-      = link_to "Logout", destroy_user_session_path, :method => :delete, class: 'btn btn-lg btn-remove pull-left'
+.panel
+  %table{:border => "0", :cellpadding => "2", :cellspacing => "2", :width => "100%"}
+    %tbody
+      %tr
+        %td{:valign => "middle"}
+          %h1 Omnildap
+        %td{:valign => "middle"}
+          #{current_user ? current_user.email : ''}
+        %td{:valign => "middle"}
+          - unless current_user
+            = link_to "Login", new_user_session_path, class: 'btn btn-lg btn-create pull-left'
+            = link_to "Signup", new_user_registration_path, class: 'btn btn-lg btn-create pull-left'
+          - else
+            = link_to "Logout", destroy_user_session_path, :method => :delete, class: 'btn btn-lg btn-remove pull-left'
+        %td{:valign => "middle"}
+          .pull-right.small
+            = Time.now

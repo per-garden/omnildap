@@ -4,10 +4,6 @@
     .section
       .container
         .row
-          .col-md-3
-            = render 'shared/status'
-          - if current_user && current_user.admin
-            .col-md-9
-              = render 'backends/index'
-        .footer
-          = Time.now
+          = render 'shared/status'
+        - if current_user && current_user.admin
+          = render 'backends/index'
