@@ -6,7 +6,7 @@ class DeviseBackend < Backend
   end
 
   def authenticate(name, password)
-    u = User.find_by_name(name)
+    u = (find_users.select { |u| u.name == name })[0]
     u && u.valid_password?(password)
   end
 

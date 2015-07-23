@@ -17,7 +17,12 @@ class LdapBackend < Backend
     result = []
     unless blocked
       if admin_authenticate
-        backend_users = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)")
+        backend_users = []
+        begin
+          Timeout::timeout("#{Rails.application.config.ldap_backend_timeout}".to_i) { backend_users = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)") }
+        rescue
+          Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
+        end
         backend_users.each do |bu|
           result << User.new(name: bu[:cn][0], email: bu[:mail][0], backends: [self])
         end

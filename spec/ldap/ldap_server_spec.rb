@@ -60,8 +60,12 @@ describe Omnildap::LdapServer do
 
     describe 'when backend blocked' do
       before do
-        @devise_backend.blocked = true
-        @devise_backend.save!
+        # All configured devise backends represent devise on local instance
+        backends = Backend.all.select { |b| b.type == 'DeviseBackend' }
+        backends.each do |b|
+          b.blocked = true
+          b.save!
+        end
       end
 
       it "fails authentication" do
@@ -70,15 +74,22 @@ describe Omnildap::LdapServer do
       end
 
       after do
-        @devise_backend.blocked = false
-        @devise_backend.save!
+        backends = Backend.all.select { |b| b.type == 'DeviseBackend' }
+        backends.each do |b|
+          b.blocked = false
+          b.save!
+        end
       end
     end
 
     describe 'with blocking email pattern' do
       before do
-        @devise_backend.email_pattern = @user.email.gsub(/.*@/, '.*@not_')
-        @devise_backend.save!
+        # All configured devise backends represent devise on local instance
+        backends = Backend.all.select { |b| b.type == 'DeviseBackend' }
+        backends.each do |b|
+          b.email_pattern = @user.email.gsub(/.*@/, '.*@not_')
+          b.save!
+        end
       end
 
       it "fails authentication for user not matching pattern" do
@@ -87,8 +98,11 @@ describe Omnildap::LdapServer do
       end
 
       after do
-        @devise_backend.email_pattern = '.*@.*'
-        @devise_backend.save!
+        backends = Backend.all.select { |b| b.type == 'DeviseBackend' }
+        backends.each do |b|
+          b.email_pattern = '.*@.*'
+          b.save!
+        end
       end
     end
   end

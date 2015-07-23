@@ -46,4 +46,6 @@ Rails.application.configure do
     :operation_args         => [],
   }
   config.ldap_basedn = 'dc=omnildap'
+  # Timeout in seconds, after which giving up backend data retrieval
+  config.ldap_backend_timeout = 45
 end
