@@ -16,6 +16,11 @@ class Backend < ActiveRecord::Base
     []
   end
 
+  # Default name to id when no name set
+  def name_string
+    name.blank? ? id.to_s : name
+  end
+
   private
 
   def init
