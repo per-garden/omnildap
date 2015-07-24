@@ -3,7 +3,7 @@
     %tbody
       %tr
         %td{:valign => "middle"}
-          %h1 Omnildap
+          = link_to image_tag('omnildap.png'), root_path
         %td{:valign => "middle"}
           #{current_user ? current_user.email : ''}
         %td{:valign => "middle"}
