@@ -1,4 +1,5 @@
 class DeviseBackend < Backend
+  acts_as_singleton
   after_initialize :init
 
   def find_users
@@ -13,6 +14,6 @@ class DeviseBackend < Backend
   private
 
   def init
-    self.host = 'localhost'
+    host = 'localhost'
   end
 end

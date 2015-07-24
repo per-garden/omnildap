@@ -1,7 +1,8 @@
 require 'spec_helper'
 
-describe DeviseBackend do
-  it "has a valid factory" do
-    expect(build :devise_backend).to be_valid
+describe 'DeviseBackend' do
+  it "is a singleton" do
+    b = DeviseBackend.instance
+    expect(DeviseBackend.instance).to eql(b)
   end
 end

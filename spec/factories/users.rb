@@ -5,7 +5,7 @@ FactoryGirl.define do
     password password
     password_confirmation password
     sequence(:name) { Faker::Internet.user_name }    
-    backends [FactoryGirl.build(:devise_backend)]
+    backends [DeviseBackend.instance]
     admin false
     blocked false
 

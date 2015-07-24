@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150717163044) do
+ActiveRecord::Schema.define(version: 20150723195253) do
 
   create_table "backends", force: true do |t|
     t.string   "name"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 20150717163044) do
     t.datetime "updated_at"
   end
 
-  add_index "backends_users", ["backend_id", "user_id"], name: "index_backends_users", unique: true
+  add_index "backends_users", ["backend_id", "user_id"], name: "index_backends_users"
 
   create_table "users", force: true do |t|
     t.datetime "created_at"

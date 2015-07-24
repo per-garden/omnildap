@@ -1,4 +1,5 @@
 class LdapBackend < Backend
+  validates_presence_of :host
   # Cannot guesswork a default entry point into LDAP tree
   validates_presence_of :base
   after_initialize :init

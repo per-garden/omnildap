@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.1.5'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
+gem 'acts_as_singleton', '~> 0.0.8'
 # Use HAML for HTML rendering
 gem 'haml-rails'
 gem 'rails_layout'
