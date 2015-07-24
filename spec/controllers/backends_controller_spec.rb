@@ -13,6 +13,11 @@ describe BackendsController do
       get :index, {}, {SERVER_NAME:'localhost:3003/backends'}
       response.should_not render_template('backends/index')
     end
+
+    it 'does not show devise backend' do
+      get :show, id: DeviseBackend.instance.id
+      response.should_not render_template('backends/show')
+    end
   end
 
   describe "admin user GET" do
@@ -25,6 +30,11 @@ describe BackendsController do
     it 'lists backends' do
       get :index, {}, {SERVER_NAME:'localhost:3003/backends'}
       response.should render_template('backends/index')
+    end
+
+    it 'shows devise backend' do
+      get :show, id: DeviseBackend.instance.id
+      response.should render_template('backends/show')
     end
   end
 end

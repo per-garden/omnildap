@@ -4,4 +4,8 @@ class BackendsController < ApplicationController
   def index
     @backends = Backend.all
   end
+
+  def show
+    @backend = Backend.find(params[:id])
+  end
 end
