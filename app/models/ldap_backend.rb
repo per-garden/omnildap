@@ -46,6 +46,7 @@ class LdapBackend < Backend
   private
 
   def init
+    super
     self.host ||= 'localhost'
     self.port ||= 10389
     @ldap = Net::LDAP.new(host: host, port: port, base: base)

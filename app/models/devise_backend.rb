@@ -14,6 +14,7 @@ class DeviseBackend < Backend
   private
 
   def init
+    super
     host = 'localhost'
   end
 end
