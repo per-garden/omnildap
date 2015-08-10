@@ -40,7 +40,12 @@ class LdapBackend < Backend
   end
 
   def authenticate(name, password)
-    @ldap.authenticate(name, password) ? @ldap.bind : false
+    begin
+      @ldap.authenticate(name, password) ? @ldap.bind : false
+    rescue
+      message = "Unable to authenticate with backend #{name_string}"
+      puts  "#{Time.now.utc.iso8601} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)} Omnildap::LdapServer INFO: #{message}\n"
+    end
   end
 
   private
@@ -53,6 +58,6 @@ class LdapBackend < Backend
   end
 
   def admin_authenticate
-    @ldap.authenticate(admin_name, admin_password) ? @ldap.bind : false
+    authenticate(admin_name, admin_password)
   end
 end
