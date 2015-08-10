@@ -40,6 +40,7 @@ class LdapBackend < Backend
   end
 
   def authenticate(name, password)
+    name = "cn=#{name},#{self.base}" unless name == self.admin_name
     begin
       @ldap.authenticate(name, password) ? @ldap.bind : false
     rescue
