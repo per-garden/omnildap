@@ -14,7 +14,7 @@ class DeviseBackend < Backend
   private
 
   def init
-    super
+    self.email_pattern ||= '.*@.*'
     host = 'localhost'
   end
 end
