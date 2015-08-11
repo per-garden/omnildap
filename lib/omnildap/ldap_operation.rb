@@ -68,10 +68,12 @@ module Omnildap
       @emails = {}
       Backend.all.each do |b|
         b.find_users.each do |bu|
-          u = @users[[bu.name]]
+          # Backend user name may be fully qualified dn
+          bu_name = bu.name.split(',')[0].split('=')[1] || bu.name
+          u = @users[[bu_name]]
           unless u
             u = bu.dup
-            @users[[bu.name]] = u
+            @users[[bu_name]] = u
             @emails[[bu.email]] = u
           end
           u.backends << b

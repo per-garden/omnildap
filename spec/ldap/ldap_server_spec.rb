@@ -102,7 +102,7 @@ describe Omnildap::LdapServer do
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}")
-      @server.add_user("#{@ldap_backend_user.name}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
+      @server.add_user("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
       # TODO: Make filtering work properly
       @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
     end
@@ -138,7 +138,7 @@ describe Omnildap::LdapServer do
       entries.each do |e|
         result << e[:cn][0]
       end
-      expect(result).to include("#{@ldap_backend_user.name}")
+      expect(result).to include("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}")
     end
 
     it "finds backend user based on email" do

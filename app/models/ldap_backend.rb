@@ -40,7 +40,10 @@ class LdapBackend < Backend
   end
 
   def authenticate(name, password)
-    name = "cn=#{name},#{self.base}" unless name == self.admin_name
+    # Fully qualified dn unless admin or already qualified
+    unless name == self.admin_name || name.split(',')[0].split('=')[1]
+      name = "cn=#{name},#{self.base}"
+    end
     begin
       @ldap.authenticate(name, password) ? @ldap.bind : false
     rescue
