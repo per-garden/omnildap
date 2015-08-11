@@ -14,6 +14,7 @@ class DeviseBackend < Backend
   private
 
   def init
+    self.blocked ||= false
     self.email_pattern ||= '.*@.*'
     host = 'localhost'
   end

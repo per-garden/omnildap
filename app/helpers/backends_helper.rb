@@ -1,0 +1,13 @@
+module BackendsHelper
+
+  def type_show(type)
+    case type
+    when 'DeviseBackend'
+      'devise_backend'
+    when 'LdapBackend'
+      'ldap_backend'
+    when 'ActiveDirectoryBackend'
+      'ldap_backend'
+    end
+  end
+end

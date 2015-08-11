@@ -23,6 +23,7 @@ class Backend < ActiveRecord::Base
   private
 
   def init
+    self.blocked ||= false
     self.email_pattern ||= '.*@.*'
   end
 end
