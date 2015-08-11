@@ -10,12 +10,10 @@ class DeviseBackend < Backend
     u = (find_users.select { |u| u.name == name })[0]
     u && u.valid_password?(password)
   end
-
+ 
   private
 
   def init
-    self.blocked ||= false
-    self.email_pattern ||= '.*@.*'
     host = 'localhost'
   end
 end
