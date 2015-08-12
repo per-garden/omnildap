@@ -37,6 +37,16 @@ describe BackendsController do
       get :edit, id: @ldap_backend.id
       response.should_not render_template('backends/edit')
     end
+
+    it 'does not present devise backend new' do
+      get :new, type: 'DeviseBackend'
+      response.should_not render_template('backends/new')
+    end
+
+    it 'does not present ldap backend new' do
+      get :new, type: 'LdapBackend'
+      response.should_not render_template('backends/new')
+    end
   end
 
   describe "admin user GET" do
@@ -69,6 +79,16 @@ describe BackendsController do
     it 'presents ldap backend edit' do
       get :edit, id: @ldap_backend.id
       response.should render_template('backends/edit')
+    end
+
+    it 'presents devise backend new' do
+      get :new, type: 'DeviseBackend'
+      response.should render_template('backends/new')
+    end
+
+    it 'presents ldap backend new' do
+      get :new, type: 'LdapBackend'
+      response.should render_template('backends/new')
     end
   end
 

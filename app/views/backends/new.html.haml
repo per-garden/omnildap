@@ -7,7 +7,7 @@
           .panel
             .panel-heading
               .h3
-                = @backend ? "Update #{@backend.type} #{@backend.name_string}" : 'Update Backend'
-                - @action = 'update'
+                = "Create #{@backend.type}"
+                - @action = 'create'
               .row
                 = render 'form'

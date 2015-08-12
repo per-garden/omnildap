@@ -1,6 +1,35 @@
 class BackendsController < ApplicationController
   before_filter :require_admin
 
+  def new
+    if params[:type] == 'DeviseBackend'
+      # Singleton!
+      @backend = DeviseBackend.instance
+    else
+      @backend = Backend.new(type: params[:type])
+    end
+  end
+
+  def create
+    type = params.keys[2]
+    case type
+    when 'devise_backend'
+      # Singleton!
+      backend = DeviseBackend.instance
+      backend.update(devise_backend_params)
+    when 'ldap_backend'
+      backend = LdapBackend.new(ldap_backend_params)
+    when 'active_directory_backend'
+      backend = ActiveDirectoryBackend.new(active_directory_backend_params)
+    end
+
+    if backend && backend.save!
+      redirect_to backend_path(backend), notice: 'Authentication backend was created.'
+    else
+      redirect_to backends_path
+    end
+  end
+
   def index
     @backends = Backend.all
   end
