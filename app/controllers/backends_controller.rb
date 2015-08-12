@@ -8,4 +8,8 @@ class BackendsController < ApplicationController
   def show
     @backend = Backend.find(params[:id])
   end
+
+  def edit
+    @backend = Backend.find(params[:id])
+  end
 end

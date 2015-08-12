@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe BackendsController do
+  before do
+    @ldap_backend = FactoryGirl.build(:ldap_backend)
+    @ldap_backend.save!
+  end
 
   describe "regular user GET" do
     before do
@@ -17,6 +21,21 @@ describe BackendsController do
     it 'does not show devise backend' do
       get :show, id: DeviseBackend.instance.id
       response.should_not render_template('backends/show')
+    end
+
+    it 'does not show ldap backend' do
+      get :show, id: @ldap_backend.id
+      response.should_not render_template('backends/show')
+    end
+
+    it 'does not present devise backend edit' do
+      get :edit, id: DeviseBackend.instance.id
+      response.should_not render_template('backends/edit')
+    end
+
+    it 'does not present ldap backend edit' do
+      get :edit, id: @ldap_backend.id
+      response.should_not render_template('backends/edit')
     end
   end
 
@@ -36,5 +55,24 @@ describe BackendsController do
       get :show, id: DeviseBackend.instance.id
       response.should render_template('backends/show')
     end
+
+    it 'shows ldap backend' do
+      get :show, id: @ldap_backend.id
+      response.should render_template('backends/show')
+    end
+
+    it 'presents devise backend edit' do
+      get :edit, id: DeviseBackend.instance.id
+      response.should render_template('backends/edit')
+    end
+
+    it 'presents ldap backend edit' do
+      get :edit, id: @ldap_backend.id
+      response.should render_template('backends/edit')
+    end
+  end
+
+  after do
+    @ldap_backend.destroy
   end
 end

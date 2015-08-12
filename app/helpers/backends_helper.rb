@@ -10,4 +10,15 @@ module BackendsHelper
       'ldap_backend'
     end
   end
+
+  def type_form(type)
+    case type
+    when 'DeviseBackend'
+      'devise_form'
+    when 'LdapBackend'
+      'ldap_form'
+    when 'ActiveDirectoryBackend'
+      'ldap_form'
+    end
+  end
 end

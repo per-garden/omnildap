@@ -1,0 +1,19 @@
+.col-md-6
+  %fieldset
+
+  .form-group
+    %span.light Host:
+    = f.text_field :host, class: 'form-control'
+
+  .form-group
+    %span.light Port:
+    = f.number_field :port, class: 'form-control'
+
+    %span.light Base:
+    = f.text_field :base, class: 'form-control'
+
+    %span.light Admin name:
+    = f.text_field :admin_name, class: 'form-control'
+
+    %span.light Admin password:
+    = f.text_field :admin_password, class: 'form-control'
