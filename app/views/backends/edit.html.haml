@@ -1,4 +1,7 @@
-%h3.page-title
-  = @backend ? "Update #{@backend.type}" : 'Update Backend'
-  - @action = 'update'
-  = render 'form'
+%html{ lang: "en"}
+  %body
+    .section
+      .container
+        .row
+          = render 'shared/status'
+          = render 'form'

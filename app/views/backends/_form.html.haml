@@ -1,27 +1,34 @@
-= form_for [:backend, @backend], url: { controller: 'backends', action: @action }, html: { class: 'form-horizontal fieldset-form' } do |f|
-  .col-md-6
-    %fieldset
+.panel
+  .panel-heading
+    .h3
+      = @backend ? "Update #{@backend.type} #{@backend.name_string}" : 'Update Backend'
+      - @action = 'update'
+    .row
+      = form_for [:backend, @backend], url: { controller: 'backends', action: @action }, html: { class: 'form-horizontal fieldset-form' } do |f|
+        .col-md-6
+          %fieldset
+      
+          .form-group
+            %span.light Name:
+            = f.text_field :name, required: true, autocomplete: "off", class: 'form-control'
+          .form-group
+            %span.light Description:
+            = f.text_area :description, autocomplete: "off", class: 'form-control'
+          .form-group
+            %span.light Email pattern:
+            = f.text_field :email_pattern, autocomplete: "off", class: 'form-control'
+          .form-group
+            %span.light Blocked:
+            = f.check_box :blocked
+      
+        .col-md-6
+          = render type_form(@backend.type), f: f
 
-    .form-group
-      %span.light Name:
-      = f.text_field :name, required: true, autocomplete: "off", class: 'form-control'
-    .form-group
-      %span.light Description:
-      = f.text_area :description, autocomplete: "off", class: 'form-control'
-    .form-group
-      %span.light Email pattern:
-      = f.text_field :email_pattern, autocomplete: "off", class: 'form-control'
-    .form-group
-      %span.light Blocked:
-      = f.check_box :blocked
-
-  = render type_form(@backend.type), f: f
-
-  .row
-    .form-actions
-      - if @backend.new_record?
-        = f.submit 'Create', class: "btn btn-create"
-        = link_to 'Cancel', backends_path(@backend), class: "btn btn-cancel"
-      - else
-        = f.submit 'Save', class: "btn btn-save"
-        = link_to 'Cancel', backend_path(@backend), class: "btn btn-cancel"
+        .col-md-12.row
+          .form-actions
+            - if @backend.new_record?
+              = f.submit 'Create', class: "btn btn-create"
+              = link_to 'Cancel', backends_path, class: "btn btn-cancel"
+            - else
+              = f.submit 'Save', class: "btn btn-save"
+              = link_to 'Cancel', backends_path, class: "btn btn-cancel"
