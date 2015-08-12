@@ -14,7 +14,6 @@ class BackendsController < ApplicationController
   end
 
   def update
-    ALog.debug params
     type = params.keys[3]
     case type
     when 'devise_backend'
