@@ -54,6 +54,8 @@ describe BackendsController do
       @request.env['devise.mapping'] = Devise.mappings[:admin]
       @admin = create(:admin)
       sign_in @admin
+      @deletable_ldap_backend = FactoryGirl.build(:ldap_backend)
+      @deletable_ldap_backend.save!
     end
 
     it 'lists backends' do
@@ -89,6 +91,21 @@ describe BackendsController do
     it 'presents ldap backend new' do
       get :new, type: 'LdapBackend'
       response.should render_template('backends/new')
+    end
+
+    it 'deletes ldap backend' do
+      id = @deletable_ldap_backend.id
+      delete :destroy, id: id
+      begin
+        result = Backend.find(id)
+      rescue
+        # This find should fail
+      end
+      expect(result).to be_nil
+    end
+
+    after do
+      @deletable_ldap_backend ? @deletable_ldap_backend.destroy : nil
     end
   end
 

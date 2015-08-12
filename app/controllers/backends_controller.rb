@@ -63,6 +63,17 @@ class BackendsController < ApplicationController
     end
   end
 
+  def destroy
+    backend = Backend.find(params[:id])
+    notice = ''
+    if backend && backend.destroy
+      notice = 'Backend deleted'
+    else
+      notice = "Unable to delete backend #{backend.name_string}"
+    end
+    redirect_to backends_path, notice: notice
+  end
+
   private
 
   def devise_backend_params
