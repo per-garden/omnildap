@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 20150811142605) do
     t.string   "type"
     t.string   "admin_name"
     t.string   "admin_password"
-    t.boolean  "blocked"
-    t.string   "email_pattern"
+    t.boolean  "blocked", default: false
+    t.string   "email_pattern", default: '.*@.*'
     t.boolean  "signup_enabled", default: true
   end
 
