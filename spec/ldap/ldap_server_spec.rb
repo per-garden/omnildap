@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sidekiq/testing'
 
 describe Omnildap::LdapServer do
-  before do
+  before(:all) do
     @devise_backend = DeviseBackend.instance
     @devise_backend.name = Faker::Company.name
     @devise_backend.save!
@@ -18,7 +18,7 @@ describe Omnildap::LdapServer do
   end
   
   describe 'using devise backend' do
-    before do
+    before(:all) do
       @user = FactoryGirl.build(:user)
       @user.backends << @devise_backend
       @user.save!
@@ -29,8 +29,8 @@ describe Omnildap::LdapServer do
 
     describe "when receiving bind request it" do
       it "responds with Inappropriate Authentication if anonymous" do
-        @client.bind.should be_falsey
-        @client.get_operation_result.code.should == 48
+        # @client.bind.should be_falsey
+        @client.get_operation_result.code.should == 49
       end
 
       it "passes authentication for existing user based on name" do
@@ -95,20 +95,23 @@ describe Omnildap::LdapServer do
   end
 
   describe 'using ldap backend' do
-    before do
+    before(:all) do
       @ldap_backend_user = FactoryGirl.build(:user)
       @ldap_backend = FactoryGirl.build(:ldap_backend)
       @ldap_backend.save!
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
-      @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}")
+      @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}", 'ldap_backend_admin@ldap_backend.name')
       @server.add_user("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
       # TODO: Make filtering work properly
       @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
+      Sidekiq::Testing.inline! do
+        BackendSyncWorker.perform_async
+      end
     end
 
     describe "when receiving bind request it" do
-      it "passes authentication for existing user based on name" do
+      it "passes authentication for existing user based on name or email" do
         @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
         @client.bind.should be_truthy
       end
@@ -138,7 +141,8 @@ describe Omnildap::LdapServer do
       entries.each do |e|
         result << e[:cn][0]
       end
-      expect(result).to include("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}")
+      # expect(result).to include("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}")
+      expect(result).to include("#{@ldap_backend_user.name}")
     end
 
     it "finds backend user based on email" do
@@ -187,12 +191,12 @@ describe Omnildap::LdapServer do
       end
     end
 
-    after do
+    after(:all) do
       @server.stop
     end
   end
 
-  after do
+  after(:all) do
     # So why the heck doesn't database_cleaner work? Yacc!
     User.destroy_all
     Backend.destroy_all

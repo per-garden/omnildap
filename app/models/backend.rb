@@ -11,6 +11,11 @@ class Backend < ActiveRecord::Base
     false
   end
 
+  def email_blocked?(name)
+    u = User.find_by_name(name)
+    u && !(u.email.match(/#{self.email_pattern}/))
+  end
+
   def find_users
     []
   end

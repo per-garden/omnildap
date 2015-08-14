@@ -8,9 +8,8 @@ module Omnildap
     def initialize(connection, messageID, hash = {})
       super(connection, messageID)
       @basedn = Rails.application.config.ldap_basedn
-      sync_with_backends
       @hash = hash
-      @hash.merge!(find_users)
+      @hash.merge!(load_users)
     end
 
     def simple_bind(version, dn, password)
@@ -21,9 +20,9 @@ module Omnildap
         raise LDAP::ResultError::InappropriateAuthentication, "Missing bind credentials. Expecting name/email, password"
       else
         if dn.include?('@')
-          u = @emails[[dn]]
+          u = User.find_by_email(dn)
         else
-          u = @users[[dn]]
+          u = User.find_by_name(dn)
         end
         unless u
           raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
@@ -63,27 +62,9 @@ module Omnildap
   
     private
 
-    def sync_with_backends
-      @users = {}
-      @emails = {}
-      Backend.all.each do |b|
-        b.find_users.each do |bu|
-          # Backend user name may be fully qualified dn
-          bu_name = bu.name.split(',')[0].split('=')[1] || bu.name
-          u = @users[[bu_name]]
-          unless u
-            u = bu.dup
-            @users[[bu_name]] = u
-            @emails[[bu.email]] = u
-          end
-          u.backends << b
-        end
-      end
-    end
-
-    def find_users
+    def load_users
       result = {}
-      @users.values.each do |u|
+      User.all.each do |u|
         entry = {}
         entry['cn'] = u.name
         entry['mail'] = u.email

@@ -25,7 +25,12 @@ class LdapBackend < Backend
           Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
         end
         backend_users.each do |bu|
-          result << User.new(name: bu[:cn][0], email: bu[:mail][0], backends: [self])
+          password = 'qwerty123'
+          unless User.find_by_email(bu[:mail][0])
+            # Backend user name may be fully qualified dn
+            bu_name = bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
+            result << User.create!(name: bu_name, email: bu[:mail][0], password: password, password_confirmation: password, backends: [self])
+          end
         end
       end
     end
@@ -40,15 +45,18 @@ class LdapBackend < Backend
   end
 
   def authenticate(name, password)
-    # Fully qualified dn unless admin or already qualified
-    unless name == self.admin_name || name.split(',')[0].split('=')[1]
-      name = "cn=#{name},#{self.base}"
-    end
-    begin
-      @ldap.authenticate(name, password) ? @ldap.bind : false
-    rescue
-      message = "Unable to authenticate with backend #{name_string}"
-      puts  "#{Time.now.utc.iso8601} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)} Omnildap::LdapServer INFO: #{message}\n"
+    # No authentication if this backend blocked or user's email blocked with it
+    unless self.blocked || email_blocked?(name.split(',')[0].split('=')[1] || name)
+      # Fully qualified dn unless admin or already qualified
+      unless name == self.admin_name || name.split(',')[0].split('=')[1]
+        name = "cn=#{name},#{self.base}"
+      end
+      begin
+        @ldap.authenticate(name, password) ? @ldap.bind : false
+      rescue
+        message = "Unable to authenticate with backend #{name_string}"
+        puts  "#{Time.now.utc.iso8601} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)} Omnildap::LdapServer INFO: #{message}\n"
+      end
     end
   end
 
