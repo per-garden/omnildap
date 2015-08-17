@@ -25,10 +25,12 @@ class LdapBackend < Backend
           Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
         end
         backend_users.each do |bu|
-          password = 'qwerty123'
           unless User.find_by_email(bu[:mail][0])
+            password = Faker::Lorem.characters(9)
             # Backend user name may be fully qualified dn
             bu_name = bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
+            ALog.debug 'Creating user'
+            ALog.debug bu_name + ', ' + bu[:mail][0]
             result << User.create!(name: bu_name, email: bu[:mail][0], password: password, password_confirmation: password, backends: [self])
           end
         end
