@@ -5,6 +5,7 @@ class BackendSyncWorker
 
   def perform
     unless @@running
+      @@running = !@@running
       BackendSync.new.sync
       @@running = !@@running
     end

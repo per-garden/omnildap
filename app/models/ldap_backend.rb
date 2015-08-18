@@ -26,7 +26,7 @@ class LdapBackend < Backend
         end
         # Remove local user if no longer exists on backend
         self.users.each do |lu|
-          (backend_users.select {|bu| bu.mail == lu.email}).empty? ? lu.destroy! : nil
+          (backend_users.select {|bu| bu[:mail][0] == lu.email}).empty? ? lu.destroy! : nil
         end
         # Add users from backend unless already exists
         backend_users.each do |bu|
