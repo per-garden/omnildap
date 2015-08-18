@@ -29,8 +29,9 @@ describe Omnildap::LdapServer do
 
     describe "when receiving bind request it" do
       it "responds with Inappropriate Authentication if anonymous" do
-        # @client.bind.should be_falsey
-        @client.get_operation_result.code.should == 49
+        @client.authenticate('', '')
+        @client.bind.should be_falsey
+        @client.get_operation_result.code.should == 48
       end
 
       it "passes authentication for existing user based on name" do
