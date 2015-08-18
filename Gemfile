@@ -3,8 +3,8 @@ source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.5'
-# Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+# Use mysql as the database for Active Record
+gem "mysql2", group: :mysql
 gem 'acts_as_singleton', '~> 0.0.8'
 # Use HAML for HTML rendering
 gem 'haml-rails'
