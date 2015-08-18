@@ -25,17 +25,30 @@ class LdapBackend < Backend
           Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
         end
         # Remove local user if no longer exists on backend
+        to_be_deleted = []
         self.users.each do |lu|
-          (backend_users.select {|bu| bu[:mail][0] == lu.email}).empty? ? lu.destroy! : nil
+          (backend_users.select {|bu| bu[:mail][0] == lu.email}).empty? ? to_be_deleted << lu : nil
+        end
+        to_be_deleted.each do |du|
+          self.users.delete(du)
+          du.destroy! if du.backends.empty?
+          self.save!
         end
         # Add users from backend unless already exists
         backend_users.each do |bu|
-          unless User.find_by_email(bu[:mail][0])
+          bu_mail = bu[:mail][0]
+          u = User.find_by_email(bu_mail)
+          if u
+            unless self.users.include?(u)
+              u.backends << self
+              u.save!
+            end
+          else
             password = Faker::Lorem.characters(9)
             # Backend user name may be fully qualified dn
             bu_name = bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
             begin
-              result << User.create!(name: bu_name, email: bu[:mail][0], password: password, password_confirmation: password, backends: [self])
+              result << User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, backends: [self])
             rescue
               #FIXME: This shouldn't happen
             end
