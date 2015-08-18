@@ -24,6 +24,11 @@ class LdapBackend < Backend
         rescue
           Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
         end
+        # Remove local user if no longer exists on backend
+        self.users.each do |lu|
+          (backend_users.select {|bu| bu.mail == lu.email}).empty? ? lu.destroy! : nil
+        end
+        # Add users from backend unless already exists
         backend_users.each do |bu|
           unless User.find_by_email(bu[:mail][0])
             password = Faker::Lorem.characters(9)
