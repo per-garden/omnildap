@@ -10,29 +10,21 @@ class ActiveDirectoryBackend < LdapBackend
   end
 
   def backend_user_cn(bu)
-    # Nonsense voodoo to be overridden by ActiveDirectoryBackend
-    name = backend_user_name(bu)
-    unless name == self.admin_name || name.split(',')[0].split('=')[1]
-      # Some idiots use non ASCII-8BIT characters and separators in CN!
-      s = bu[0][:dn][0].force_encoding('UTF-8')
-      s.gsub!(/\\,/, ',')
-      # Everything between first "=" and base is cn
-      cn = s.split(base)[0].split('=')[1].split(',').join(',')
-      # Feed the idiots using non ASCII-8BIT characters and separators in CN!
-      cn.gsub!(/,/, "\\,")
-    end
+    # Some idiots use non ASCII-8BIT characters and separators in CN!
+    s = bu[0][:dn][0].force_encoding('UTF-8')
+    s.gsub!(/\\,/, ',')
+    # Everything between first "=" and base is cn
+    cn = s.split(base)[0].split('=')[1].split(',').join(',')
+    # Feed the idiots using non ASCII-8BIT characters and separators in CN!
+    cn.gsub!(/,/, "\\,")
   end
 
   def backend_user_dn(name)
+    # Fully qualified dn unless admin or already qualified
     unless name == self.admin_name || name.split(',')[0].split('=')[1]
-      # Some idiots use non ASCII-8BIT characters and separators in CN!
-      s = bu[0][:dn][0].force_encoding('UTF-8')
-      s.gsub!(/\\,/, ',')
-      # Everything between first "=" and base is cn
-      cn = s.split(base)[0].split('=')[1].split(',').join(',')
-      # Feed the idiots using non ASCII-8BIT characters and separators in CN!
-      cn.gsub!(/,/, "\\,")
-      'cn=' + cn + ',' + base
+      u = User.find_by_name(name)
+      name = "cn=#{u.cn},#{self.base}"
     end
+    name
   end
 end

@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
-  validates_presence_of :name, :email
+  validates_presence_of :name, :email, :cn
   has_and_belongs_to_many :backends
   validates_presence_of :backends, :message => 'must not be empty'
   after_initialize :init

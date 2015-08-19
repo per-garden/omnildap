@@ -49,10 +49,10 @@ class LdapBackend < Backend
           else
             password = Faker::Lorem.characters(9)
             # Backend user name may be fully qualified dn
-            bu_name = backend_user_name(bu) # bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
+            bu_name = backend_user_name(bu)
+            bu_cn = backend_user_cn(bu)
             begin
-              #TODO: User backend_user_cn to add cn here
-              result << User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, backends: [self])
+              result << User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, cn: bu_cn, backends: [self])
             rescue
               #FIXME: This shouldn't happen
             end
@@ -73,10 +73,6 @@ class LdapBackend < Backend
   def authenticate(name, password)
     # No authentication if this backend blocked or user's email blocked with it
     unless self.blocked || email_blocked?(name.split(',')[0].split('=')[1] || name)
-      # Fully qualified dn unless admin or already qualified
-      # unless name == self.admin_name || name.split(',')[0].split('=')[1]
-      #   name = "cn=#{name},#{self.base}"
-      # end
       name = backend_user_dn(name)
       begin
         @ldap.authenticate(name, password) ? @ldap.bind : false

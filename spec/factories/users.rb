@@ -5,6 +5,7 @@ FactoryGirl.define do
     password password
     password_confirmation password
     sequence(:name) { Faker::Internet.user_name }    
+    cn 'dummy_cn'
     backends [DeviseBackend.instance]
     admin false
     blocked false
