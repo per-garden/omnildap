@@ -4,6 +4,9 @@ class LdapBackend < Backend
   validates_presence_of :base
   after_initialize :init
 
+  # LDAP objectClass of which to retreive users as instances
+  @@FILTER = "(objectClass=inetOrgPerson)"
+
   def signup(email, name, password)
     ldap = Net::LDAP.new(host: host, port: port, base: base)
     ldap.authenticate("cn=#{name}," + base, password)
@@ -46,8 +49,9 @@ class LdapBackend < Backend
           else
             password = Faker::Lorem.characters(9)
             # Backend user name may be fully qualified dn
-            bu_name = bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
+            bu_name = backend_user_name(bu) # bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
             begin
+              #TODO: User backend_user_cn to add cn here
               result << User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, backends: [self])
             rescue
               #FIXME: This shouldn't happen
@@ -70,9 +74,10 @@ class LdapBackend < Backend
     # No authentication if this backend blocked or user's email blocked with it
     unless self.blocked || email_blocked?(name.split(',')[0].split('=')[1] || name)
       # Fully qualified dn unless admin or already qualified
-      unless name == self.admin_name || name.split(',')[0].split('=')[1]
-        name = "cn=#{name},#{self.base}"
-      end
+      # unless name == self.admin_name || name.split(',')[0].split('=')[1]
+      #   name = "cn=#{name},#{self.base}"
+      # end
+      name = backend_user_dn(name)
       begin
         @ldap.authenticate(name, password) ? @ldap.bind : false
       rescue
@@ -93,5 +98,23 @@ class LdapBackend < Backend
 
   def admin_authenticate
     authenticate(admin_name, admin_password)
+  end
+
+  def backend_user_name(bu)
+    # Backend user name may be fully qualified dn
+    bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
+  end
+
+  def backend_user_cn(bu)
+    # Nonsense voodoo to be overridden by ActiveDirectoryBackend
+    backend_user_name(bu)
+  end
+
+  def backend_user_dn(name)
+    # Fully qualified dn unless admin or already qualified
+    unless name == self.admin_name || name.split(',')[0].split('=')[1]
+      name = "cn=#{name},#{self.base}"
+    end
+    name
   end
 end
