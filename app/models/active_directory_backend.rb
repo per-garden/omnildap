@@ -1,9 +1,13 @@
 class ActiveDirectoryBackend < LdapBackend
 
-  # LDAP objectClass of which to retreive users as instances
-  @@FILTER = "(objectClass=organizationalPerson)"
-
   private
+
+  def init
+    super
+    # LDAP objectClass of which to retreive users as instances
+    self.filter = "(objectClass=organizationalPerson)"
+    @ldap = Net::LDAP.new(host: host, port: port, base: base)
+  end
 
   def backend_user_name(bu)
     bu[:samaccountname][0].split(',')[0].split('=')[1] || bu[:samaccountname][0]

@@ -4,9 +4,6 @@ class LdapBackend < Backend
   validates_presence_of :base
   after_initialize :init
 
-  # LDAP objectClass of which to retreive users as instances
-  @@FILTER = "(objectClass=inetOrgPerson)"
-
   def signup(email, name, password)
     ldap = Net::LDAP.new(host: host, port: port, base: base)
     ldap.authenticate("cn=#{name}," + base, password)
@@ -23,7 +20,7 @@ class LdapBackend < Backend
       if admin_authenticate
         backend_users = []
         begin
-          Timeout::timeout("#{Rails.application.config.ldap_backend_timeout}".to_i) { backend_users = @ldap.search(base: base, filter: "(objectClass=inetOrgPerson)") }
+          Timeout::timeout("#{Rails.application.config.ldap_backend_timeout}".to_i) { backend_users = @ldap.search(base: base, filter: filter) }
         rescue
           Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
         end
@@ -89,6 +86,8 @@ class LdapBackend < Backend
     super
     self.host ||= 'localhost'
     self.port ||= 10389
+    # LDAP objectClass of which to retreive users as instances
+    self.filter ||= "(objectClass=inetOrgPerson)"
     @ldap = Net::LDAP.new(host: host, port: port, base: base)
   end
 
