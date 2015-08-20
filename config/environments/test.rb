@@ -47,7 +47,7 @@ Rails.application.configure do
   }
   config.ldap_basedn = 'dc=omnildap'
   # Timeout in seconds, after which giving up backend data retrieval
-  config.ldap_backend_timeout = 45
+  config.ldap_backend_timeout = 60
   # Interval in seconds between backend synchronisations (0 for startup sync only)
-  config.backend_sync_interval = 0
+  config.backend_sync_interval = 1800
 end

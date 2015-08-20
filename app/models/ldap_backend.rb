@@ -27,16 +27,15 @@ class LdapBackend < Backend
         # Remove local user if no longer exists on backend
         to_be_deleted = []
         self.users.each do |lu|
-          (backend_users.select {|bu| bu[:mail][0] == lu.email}).empty? ? to_be_deleted << lu : nil
+          (backend_users.select {|bu| (bu[:mail][0]).downcase == lu.email}).empty? ? to_be_deleted << lu : nil
         end
         to_be_deleted.each do |du|
           self.users.delete(du)
           du.destroy! if du.backends.empty?
-          self.save!
         end
         # Add users from backend unless already exists
         backend_users.each do |bu|
-          bu_mail = bu[:mail][0]
+          bu_mail = (bu[:mail][0]).downcase
           u = User.find_by_email(bu_mail)
           if u
             unless self.users.include?(u)
@@ -55,6 +54,7 @@ class LdapBackend < Backend
             end
           end
         end
+        self.save!
       end
     end
     result.select { |u| u.email.match(/#{email_pattern}/)}

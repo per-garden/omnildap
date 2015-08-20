@@ -4,8 +4,7 @@ class ActiveDirectoryBackend < LdapBackend
 
   def init
     super
-    # LDAP objectClass of which to retreive users as instances
-    self.filter = "(objectClass=organizationalPerson)"
+    self.filter = "(mail=*)"
     @ldap = Net::LDAP.new(host: host, port: port, base: base)
   end
 
@@ -15,7 +14,7 @@ class ActiveDirectoryBackend < LdapBackend
 
   def backend_user_cn(bu)
     # Some idiots use non ASCII-8BIT characters and separators in CN!
-    s = bu[0][:dn][0].force_encoding('UTF-8')
+    s = bu[:dn][0].force_encoding('UTF-8')
     s.gsub!(/\\,/, ',')
     # Everything between first "=" and base is cn
     cn = s.split(base)[0].split('=')[1].split(',').join(',')
