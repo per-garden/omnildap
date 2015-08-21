@@ -15,49 +15,21 @@ class LdapBackend < Backend
   end
 
   def find_users
-    result = []
     unless blocked
       if admin_authenticate
         backend_users = []
+        timed_out = false
         begin
           Timeout::timeout("#{Rails.application.config.ldap_backend_timeout}".to_i) { backend_users = @ldap.search(base: base, filter: filter) }
         rescue
+          timed_out = true
           Rails.logger.warn("Backend timeout on #{self.class.name}: #{self.name_string}")
         end
-        # Remove local user if no longer exists on backend
-        to_be_deleted = []
-        self.users.each do |lu|
-          (backend_users.select {|bu| (bu[:mail][0]).downcase == lu.email}).empty? ? to_be_deleted << lu : nil
+        unless timed_out
+          sync_users(backend_users)
         end
-        to_be_deleted.each do |du|
-          self.users.delete(du)
-          du.destroy! if du.backends.empty?
-        end
-        # Add users from backend unless already exists
-        backend_users.each do |bu|
-          bu_mail = (bu[:mail][0]).downcase
-          u = User.find_by_email(bu_mail)
-          if u
-            unless self.users.include?(u)
-              u.backends << self
-              u.save!
-            end
-          else
-            password = Faker::Lorem.characters(9)
-            # Backend user name may be fully qualified dn
-            bu_name = backend_user_name(bu)
-            bu_cn = backend_user_cn(bu)
-            begin
-              result << User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, cn: bu_cn, backends: [self])
-            rescue
-              #FIXME: This shouldn't happen
-            end
-          end
-        end
-        self.save!
       end
     end
-    result.select { |u| u.email.match(/#{email_pattern}/)}
   end
 
   def find_groups_by_ldap
@@ -111,5 +83,39 @@ class LdapBackend < Backend
       name = "cn=#{name},#{self.base}"
     end
     name
+  end
+
+  def sync_users(backend_users)
+    # Remove local user if no longer exists on backend
+    to_be_deleted = []
+    self.users.each do |lu|
+      (backend_users.select {|bu| (bu[:mail][0]).downcase == lu.email}).empty? ? to_be_deleted << lu : nil
+    end
+    to_be_deleted.each do |du|
+      self.users.delete(du)
+      du.destroy! if du.backends.empty?
+    end
+    # Add users from backend unless already exists
+    backend_users.each do |bu|
+      bu_mail = (bu[:mail][0]).downcase
+      u = User.find_by_email(bu_mail)
+      if u
+        unless self.users.include?(u)
+          u.backends << self
+          u.save!
+        end
+      else
+        password = Faker::Lorem.characters(9)
+        # Backend user name may be fully qualified dn
+        bu_name = backend_user_name(bu)
+        bu_cn = backend_user_cn(bu)
+        begin
+          User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, cn: bu_cn, backends: [self])
+        rescue
+          #FIXME: This shouldn't happen
+        end
+      end
+    end
+    self.save!
   end
 end
