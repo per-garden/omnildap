@@ -80,11 +80,6 @@ class LdapBackend < Backend
     bu[:cn][0].split(',')[0].split('=')[1] || bu[:cn][0]
   end
 
-  def backend_user_cn(bu)
-    # Nonsense voodoo to be overridden by ActiveDirectoryBackend
-    backend_user_name(bu)
-  end
-
   def sync_users(backend_users)
     # Remove local user if no longer exists on backend
     to_be_deleted = []
@@ -108,9 +103,8 @@ class LdapBackend < Backend
         password = Faker::Lorem.characters(9)
         # Backend user name may be fully qualified dn
         bu_name = backend_user_name(bu)
-        bu_cn = backend_user_cn(bu)
         begin
-          User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, cn: bu_cn, backends: [self])
+          User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, backends: [self])
         rescue
           #FIXME: This shouldn't happen
         end
