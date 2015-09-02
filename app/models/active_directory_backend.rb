@@ -1,5 +1,15 @@
 class ActiveDirectoryBackend < LdapBackend
 
+  def backend_user_dn(name)
+    # Drop qualified dn and append domain unless admin
+    unless name == self.admin_name || name.split(',')[0].split('=')[1]
+      # TODO: Configurable in AD-backend - not hard-coded!
+      domain = 'CORPUSERS.NET'
+      name = name + "@#{domain}"
+    end
+    name
+  end
+
   private
 
   def init
@@ -20,14 +30,5 @@ class ActiveDirectoryBackend < LdapBackend
     cn = s.split(base)[0].split('=')[1].split(',').join(',')
     # Feed the idiots using non ASCII-8BIT characters and separators in CN!
     cn.gsub!(/,/, "\\,")
-  end
-
-  def backend_user_dn(name)
-    # Fully qualified dn unless admin or already qualified
-    unless name == self.admin_name || name.split(',')[0].split('=')[1]
-      u = User.find_by_name(name)
-      name = "cn=#{u.cn},#{self.base}"
-    end
-    name
   end
 end

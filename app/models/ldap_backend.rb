@@ -52,6 +52,14 @@ class LdapBackend < Backend
     end
   end
 
+  def backend_user_dn(name)
+    # Fully qualified dn unless admin or already qualified
+    unless name == self.admin_name || name.split(',')[0].split('=')[1]
+      name = "cn=#{name},#{self.base}"
+    end
+    name
+  end
+
   private
 
   def init
@@ -75,14 +83,6 @@ class LdapBackend < Backend
   def backend_user_cn(bu)
     # Nonsense voodoo to be overridden by ActiveDirectoryBackend
     backend_user_name(bu)
-  end
-
-  def backend_user_dn(name)
-    # Fully qualified dn unless admin or already qualified
-    unless name == self.admin_name || name.split(',')[0].split('=')[1]
-      name = "cn=#{name},#{self.base}"
-    end
-    name
   end
 
   def sync_users(backend_users)

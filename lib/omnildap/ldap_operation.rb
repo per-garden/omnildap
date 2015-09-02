@@ -22,7 +22,12 @@ module Omnildap
         if dn.include?('@')
           u = User.find_by_email(dn)
         else
-          u = User.find_by_name(dn)
+          # Fully qualified dn?
+          name = dn.split(',')[0].split('=')[1] || dn
+          ALog.debug 'Trying find_user_by_name: ' + name
+          u = User.find_by_name(name)
+          ALog.debug 'Got it' if u
+          u
         end
         unless u
           raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
@@ -48,10 +53,14 @@ module Omnildap
       when 1
         raise LDAP::ResultError::UnwillingToPerform, "OneLevel not implemented"
       when 2
+        ALog.debug 'WTF??!!'
         # Subtree
         @hash.keys.each do |key|
-          obj = @hash[key]
-          send_SearchResultEntry(basedn, obj) if obj && LDAP::Server::Filter.run(filter, obj)
+          entry = @hash[key]
+          if Omnildap::LdapFilter.run(filter, entry)
+            ALog.debug entry
+            send_SearchResultEntry("cn=#{entry['cn']}," + basedn, entry)
+          end
         end
       when 3
         raise LDAP::ResultError::UnwillingToPerform, "Children not implemented"
@@ -66,6 +75,8 @@ module Omnildap
       result = {}
       User.all.each do |u|
         entry = {}
+        # entry['sn'] = 'Fred Flintstone'
+        # entry['userpassword'] = 'gnA11arg'
         entry['cn'] = u.name
         entry['mail'] = u.email
         result["cn=#{u.name},#{@basedn}"] = entry

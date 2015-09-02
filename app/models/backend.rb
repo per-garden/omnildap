@@ -25,6 +25,10 @@ class Backend < ActiveRecord::Base
     name.blank? ? id.to_s : name
   end
 
+  def backend_user_dn(name)
+    name
+  end
+
   private
 
   def init
