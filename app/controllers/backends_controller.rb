@@ -85,6 +85,6 @@ class BackendsController < ApplicationController
   end
 
   def active_directory_backend_params
-    params.require(:active_directory_backend).permit(:name, :description, :host, :base, :port, :admin_name, :admin_password, :blocked, :email_pattern)
+    params.require(:active_directory_backend).permit(:name, :description, :host, :base, :port, :admin_name, :admin_password, :blocked, :email_pattern, :domain)
   end
 end

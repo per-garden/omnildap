@@ -7,7 +7,7 @@ module BackendsHelper
     when 'LdapBackend'
       'ldap_backend'
     when 'ActiveDirectoryBackend'
-      'ldap_backend'
+      'active_directory_backend'
     end
   end
 
@@ -18,7 +18,7 @@ module BackendsHelper
     when 'LdapBackend'
       'ldap_form'
     when 'ActiveDirectoryBackend'
-      'ldap_form'
+      'active_directory_form'
     end
   end
 end

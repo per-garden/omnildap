@@ -17,7 +17,8 @@
         = f.check_box :blocked
   
     .col-md-6
-      = render type_form(@backend.type), f: f
+      %fieldset
+        = render type_form(@backend.type), f: f
 
     .col-md-12.row
       .form-actions

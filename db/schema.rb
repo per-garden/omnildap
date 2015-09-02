@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902130100) do
+ActiveRecord::Schema.define(version: 20150902144645) do
 
   create_table "backends", force: true do |t|
     t.string   "name"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20150902130100) do
     t.string   "email_pattern",  default: ".*@.*"
     t.boolean  "signup_enabled", default: true
     t.string   "filter"
+    t.string   "domain"
   end
 
   create_table "backends_users", id: false, force: true do |t|
