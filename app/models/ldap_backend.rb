@@ -42,7 +42,7 @@ class LdapBackend < Backend
   def authenticate(name, password)
     # No authentication if this backend blocked or user's email blocked with it
     unless self.blocked || email_blocked?(name.split(',')[0].split('=')[1] || name)
-      name = backend_user_dn(name)
+      name = backend_auth_name(name)
       begin
         @ldap.authenticate(name, password) ? @ldap.bind : false
       rescue
@@ -52,15 +52,15 @@ class LdapBackend < Backend
     end
   end
 
-  def backend_user_dn(name)
+  private
+
+  def backend_auth_name(name)
     # Fully qualified dn unless admin or already qualified
     unless name == self.admin_name || name.split(',')[0].split('=')[1]
       name = "cn=#{name},#{self.base}"
     end
     name
   end
-
-  private
 
   def init
     super

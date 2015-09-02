@@ -25,11 +25,11 @@ class Backend < ActiveRecord::Base
     name.blank? ? id.to_s : name
   end
 
-  def backend_user_dn(name)
+  private
+
+  def backend_auth_name(name)
     name
   end
-
-  private
 
   def init
     self.blocked ||= false

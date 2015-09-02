@@ -1,6 +1,8 @@
 class ActiveDirectoryBackend < LdapBackend
 
-  def backend_user_dn(name)
+  private
+
+  def backend_auth_name(name)
     # Drop qualified dn and append domain unless admin
     unless name == self.admin_name || name.split(',')[0].split('=')[1]
       # TODO: Configurable in AD-backend - not hard-coded!
@@ -9,8 +11,6 @@ class ActiveDirectoryBackend < LdapBackend
     end
     name
   end
-
-  private
 
   def init
     super
