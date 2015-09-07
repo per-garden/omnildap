@@ -2,13 +2,13 @@
 
 Omnildap is an LDAP front-end to one or several LDAP or non-LDAP backends. Please refer to wiki pages and doc directory for further information.
 
-* Omnildap currently uses ruby 2.1.2p95 (2014-05-08 revision 45877) [x86_64-linux].
+* Omnildap currently uses ruby 2.1.7p400 (2015-08-18 revision 51632) [x86_64-linux].
 
 * Rails 4.1.5
 
-* Current implementation uses Sqlite3 (3.7.9). We stick with this database as long asperformance will cope. That's going to be a long way :-)
+* Current implementation uses MySQL for data persistence
 
-* Tests needs to written...!
+* Basic Rspec tests exist for both Web and LDAP frontends.
 
 * Omnildap listens as a regular web server (port 3000) as well as a simple LDAP server (port 1389)
 
