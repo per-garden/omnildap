@@ -24,10 +24,7 @@ module Omnildap
         else
           # Fully qualified dn?
           name = dn.split(',')[0].split('=')[1] || dn
-          ALog.debug 'Trying find_user_by_name: ' + name
           u = User.find_by_name(name)
-          ALog.debug 'Got it' if u
-          u
         end
         unless u
           raise LDAP::ResultError::InvalidCredentials, 'User does not exist'
@@ -53,12 +50,10 @@ module Omnildap
       when 1
         raise LDAP::ResultError::UnwillingToPerform, "OneLevel not implemented"
       when 2
-        ALog.debug 'WTF??!!'
         # Subtree
         @hash.keys.each do |key|
           entry = @hash[key]
           if Omnildap::LdapFilter.run(filter, entry)
-            ALog.debug entry
             send_SearchResultEntry("cn=#{entry['cn']}," + basedn, entry)
           end
         end
