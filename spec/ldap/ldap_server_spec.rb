@@ -30,33 +30,33 @@ describe Omnildap::LdapServer do
     describe "when receiving bind request it" do
       it "responds with Inappropriate Authentication if anonymous" do
         @client.authenticate('', '')
-        @client.bind.should be_falsey
-        @client.get_operation_result.code.should == 48
+        expect(@client.bind).to be_falsey
+        expect(@client.get_operation_result.code).to eq 48
       end
 
       it "passes authentication for existing user based on name" do
         @client.authenticate("#{@user.name}", "#{@user.password}")
-        @client.bind.should be_truthy
+        expect(@client.bind).to be_truthy
       end
 
       it "passes authentication for existing user based on email" do
         @client.authenticate("#{@user.email}", "#{@user.password}")
-        @client.bind.should be_truthy
+        expect(@client.bind).to be_truthy
       end
 
       it "fails authentication for non-existing user" do
         @client.authenticate("not_#{@user.name}", "#{@user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       it "fails authentication with invalid credentials" do
         @client.authenticate("#{@user.name}", "not_#{@user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       it "fails authentication for blocked user" do
         @client.authenticate("#{@blocked_user.name}", "#{@blocked_user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
     end
 
@@ -68,7 +68,7 @@ describe Omnildap::LdapServer do
 
       it "fails authentication" do
         @client.authenticate("#{@user.name}", "#{@user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       after do
@@ -85,7 +85,7 @@ describe Omnildap::LdapServer do
 
       it "fails authentication for user not matching pattern" do
         @client.authenticate("#{@user.name}", "#{@user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       after do
@@ -114,28 +114,28 @@ describe Omnildap::LdapServer do
     describe "when receiving bind request it" do
       it "passes authentication for existing user based on name or email" do
         @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
-        @client.bind.should be_truthy
+        expect(@client.bind).to be_truthy
       end
 
       it "passes authentication for existing user based on email" do
         @client.authenticate("#{@ldap_backend_user.email}", "#{@ldap_backend_user.password}")
-        @client.bind.should be_truthy
+        expect(@client.bind).to be_truthy
       end
 
       it "fails authentication for non-existing user" do
         @client.authenticate("not_#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       it "fails authentication with invalid credentials" do
         @client.authenticate("#{@ldap_backend_user.name}", "not_#{@ldap_backend_user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
     end
 
     it 'finds backend user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
-      @client.bind.should be_truthy
+      expect(@client.bind).to be_truthy
       base = "#{Rails.application.config.ldap_basedn}"
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -148,7 +148,7 @@ describe Omnildap::LdapServer do
 
     it "finds backend user based on email" do
       @client.authenticate(@admin.name, @admin.password)
-      @client.bind.should be_truthy
+      expect(@client.bind).to be_truthy
       base = "#{Rails.application.config.ldap_basedn}"
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -166,7 +166,7 @@ describe Omnildap::LdapServer do
 
       it "fails authentication" do
         @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       after do
@@ -183,7 +183,7 @@ describe Omnildap::LdapServer do
 
       it "fails authentication for user not matching pattern" do
         @client.authenticate("#{@ldap_backend_user.name}", "#{@ldap_backend_user.password}")
-        @client.bind.should be_falsey
+        expect(@client.bind).to be_falsey
       end
 
       after do

@@ -15,37 +15,37 @@ describe BackendsController do
 
     it 'does not list backends' do
       get :index, {}, {SERVER_NAME:'localhost:3003/backends'}
-      response.should_not render_template('backends/index')
+      expect(response).to_not render_template('backends/index')
     end
 
     it 'does not show devise backend' do
       get :show, id: DeviseBackend.instance.id
-      response.should_not render_template('backends/show')
+      expect(response).to_not render_template('backends/show')
     end
 
     it 'does not show ldap backend' do
       get :show, id: @ldap_backend.id
-      response.should_not render_template('backends/show')
+      expect(response).to_not render_template('backends/show')
     end
 
     it 'does not present devise backend edit' do
       get :edit, id: DeviseBackend.instance.id
-      response.should_not render_template('backends/edit')
+      expect(response).to_not render_template('backends/edit')
     end
 
     it 'does not present ldap backend edit' do
       get :edit, id: @ldap_backend.id
-      response.should_not render_template('backends/edit')
+      expect(response).to_not render_template('backends/edit')
     end
 
     it 'does not present devise backend new' do
       get :new, type: 'DeviseBackend'
-      response.should_not render_template('backends/new')
+      expect(response).to_not render_template('backends/new')
     end
 
     it 'does not present ldap backend new' do
       get :new, type: 'LdapBackend'
-      response.should_not render_template('backends/new')
+      expect(response).to_not render_template('backends/new')
     end
   end
 
@@ -60,37 +60,37 @@ describe BackendsController do
 
     it 'lists backends' do
       get :index, {}, {SERVER_NAME:'localhost:3003/backends'}
-      response.should render_template('backends/index')
+      expect(response).to render_template('backends/index')
     end
 
     it 'shows devise backend' do
       get :show, id: DeviseBackend.instance.id
-      response.should render_template('backends/show')
+      expect(response).to render_template('backends/show')
     end
 
     it 'shows ldap backend' do
       get :show, id: @ldap_backend.id
-      response.should render_template('backends/show')
+      expect(response).to render_template('backends/show')
     end
 
     it 'presents devise backend edit' do
       get :edit, id: DeviseBackend.instance.id
-      response.should render_template('backends/edit')
+      expect(response).to render_template('backends/edit')
     end
 
     it 'presents ldap backend edit' do
       get :edit, id: @ldap_backend.id
-      response.should render_template('backends/edit')
+      expect(response).to render_template('backends/edit')
     end
 
     it 'presents devise backend new' do
       get :new, type: 'DeviseBackend'
-      response.should render_template('backends/new')
+      expect(response).to render_template('backends/new')
     end
 
     it 'presents ldap backend new' do
       get :new, type: 'LdapBackend'
-      response.should render_template('backends/new')
+      expect(response).to render_template('backends/new')
     end
 
     it 'deletes ldap backend' do
@@ -99,7 +99,7 @@ describe BackendsController do
       begin
         result = Backend.find(id)
       rescue
-        # This find should fail
+        # Expecting this find to fail
       end
       expect(result).to be_nil
     end

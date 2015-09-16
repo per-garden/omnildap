@@ -6,6 +6,6 @@ describe User do
   end
 
   it 'belongs to a backend' do
-    build(:user, backends: []).should_not be_valid
+    expect(build(:user, backends: [])).not_to be_valid
   end
 end

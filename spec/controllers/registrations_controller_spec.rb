@@ -9,7 +9,7 @@ describe Users::RegistrationsController do
 
     it 'lets user sign up' do
       get :new, {}, {SERVER_NAME:'localhost:3003'}
-      response.should render_template('devise/registrations/new')
+      expect(response).to render_template('devise/registrations/new')
     end
 
     describe 'with blocked sign-up' do
@@ -21,7 +21,7 @@ describe Users::RegistrationsController do
 
       it 'does not let user sign up' do
         get :new, {}, {SERVER_NAME:'localhost:3003'}
-        response.should redirect_to(root_path)
+        expect(response).to redirect_to(root_path)
       end
 
       after do
