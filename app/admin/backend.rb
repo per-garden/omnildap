@@ -20,11 +20,10 @@ ActiveAdmin.register Backend do
   filter :users
 
   controller do
-    before_filter :authorise
 
     private
 
-    def authorise
+    def authenticate_user!
       redirect_to(root_path) unless current_user && current_user.admin
     end
   end
