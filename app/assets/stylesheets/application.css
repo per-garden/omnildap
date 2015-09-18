@@ -10,14 +10,6 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- * Cannot require tree due to active_admin
- * http://stackoverflow.com/questions/19304681/activeadmin-overides-my-css
- *= require bootstrap.css
- *= require bootstrap-theme.min.css
- *= require generic/lists.scss
- *= require generic/common.scss
- *= require bootstrap.min.css
- *= require home.css.scss
- *= require bootstrap-theme.css
+ *= require_tree .
  *= require_self
  */
