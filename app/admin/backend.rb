@@ -1,5 +1,19 @@
 ActiveAdmin.register Backend do
+
+  config.clear_action_items!
+
+  action_item :only => :index do
+    label 'New: '
+  end
+  ['DeviseBackend', 'LdapBackend', 'ActiveDirectoryBackend'].each do |b|
+    # How does one make Arbre piece of crap create neat drop down?
+    action_item :only => :index do
+      link_to b, new_backend_path(type: b)
+    end
+  end
+
   index do
+
     column :type
     column :name_string
     column :description
