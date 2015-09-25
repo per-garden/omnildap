@@ -2,7 +2,7 @@ ActiveAdmin.register Backend do
 
   config.clear_action_items!
 
-  action_item :only => :index do
+  action_item 'new_dropdown', only: :index do
     render partial: 'new_dropdown'
   end
 
