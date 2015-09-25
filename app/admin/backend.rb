@@ -3,17 +3,10 @@ ActiveAdmin.register Backend do
   config.clear_action_items!
 
   action_item :only => :index do
-    label 'New: '
-  end
-  ['DeviseBackend', 'LdapBackend', 'ActiveDirectoryBackend'].each do |b|
-    # How does one make Arbre piece of crap create neat drop down?
-    action_item :only => :index do
-      link_to b, new_backend_path(type: b)
-    end
+    render partial: 'new_dropdown'
   end
 
   index do
-
     column :type
     column :name_string
     column :description
@@ -33,7 +26,27 @@ ActiveAdmin.register Backend do
   filter :domain
   filter :users
 
+  form do |f|
+    # ActiveAdmin madness! Already fetched in controller!
+    if params[:type] == 'DeviseBackend'
+      # Singleton!
+      @backend = DeviseBackend.instance
+    else
+      @backend = Backend.new(type: params[:type])
+    end
+    render partial: 'form'
+  end
+
   controller do
+
+    def new
+      if params[:type] == 'DeviseBackend'
+        # Singleton!
+        @backend = DeviseBackend.instance
+      else
+        @backend = Backend.new(type: params[:type])
+      end
+    end
 
     private
 
@@ -41,4 +54,5 @@ ActiveAdmin.register Backend do
       redirect_to(root_path) unless current_user && current_user.admin
     end
   end
+
 end
