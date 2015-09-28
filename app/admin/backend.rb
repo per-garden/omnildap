@@ -14,7 +14,7 @@ ActiveAdmin.register Backend do
     actions
   end
 
-  filter :type
+  filter :type, as: :select, collection: -> {Backend.all.map{|s| s.type}.uniq}
   filter :name
   filter :description
   filter :host
