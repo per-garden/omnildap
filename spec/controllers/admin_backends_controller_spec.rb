@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BackendsController do
+describe Admin::BackendsController do
   before do
     @ldap_backend = FactoryGirl.build(:ldap_backend)
     @ldap_backend.save!
@@ -14,38 +14,38 @@ describe BackendsController do
     end
 
     it 'does not list backends' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/backends'}
-      expect(response).to_not render_template('backends/index')
+      get :index, {}, {SERVER_NAME:'localhost:3003/admin/backends'}
+      expect(response).to_not render_template('active_admin/resource/index')
     end
 
     it 'does not show devise backend' do
       get :show, id: DeviseBackend.instance.id
-      expect(response).to_not render_template('backends/show')
+      expect(response).to_not render_template('active_admin/resource/show')
     end
 
     it 'does not show ldap backend' do
       get :show, id: @ldap_backend.id
-      expect(response).to_not render_template('backends/show')
+      expect(response).to_not render_template('active_admin/resource/show')
     end
 
     it 'does not present devise backend edit' do
       get :edit, id: DeviseBackend.instance.id
-      expect(response).to_not render_template('backends/edit')
+      expect(response).to_not render_template('active_admin/resource/edit')
     end
 
     it 'does not present ldap backend edit' do
       get :edit, id: @ldap_backend.id
-      expect(response).to_not render_template('backends/edit')
+      expect(response).to_not render_template('active_admin/resource/edit')
     end
 
     it 'does not present devise backend new' do
       get :new, type: 'DeviseBackend'
-      expect(response).to_not render_template('backends/new')
+      expect(response).to_not render_template('active_admin/resource/new')
     end
 
     it 'does not present ldap backend new' do
       get :new, type: 'LdapBackend'
-      expect(response).to_not render_template('backends/new')
+      expect(response).to_not render_template('active_admin/resource/new')
     end
   end
 
@@ -59,38 +59,38 @@ describe BackendsController do
     end
 
     it 'lists backends' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/backends'}
-      expect(response).to render_template('backends/index')
+      get :index, {}, {SERVER_NAME:'localhost:3003/admin/backends'}
+      expect(response).to render_template('active_admin/resource/index')
     end
 
     it 'shows devise backend' do
       get :show, id: DeviseBackend.instance.id
-      expect(response).to render_template('backends/show')
+      expect(response).to render_template('active_admin/resource/show')
     end
 
     it 'shows ldap backend' do
       get :show, id: @ldap_backend.id
-      expect(response).to render_template('backends/show')
+      expect(response).to render_template('active_admin/resource/show')
     end
 
     it 'presents devise backend edit' do
       get :edit, id: DeviseBackend.instance.id
-      expect(response).to render_template('backends/edit')
+      expect(response).to render_template('active_admin/resource/edit')
     end
 
     it 'presents ldap backend edit' do
       get :edit, id: @ldap_backend.id
-      expect(response).to render_template('backends/edit')
+      expect(response).to render_template('active_admin/resource/edit')
     end
 
     it 'presents devise backend new' do
       get :new, type: 'DeviseBackend'
-      expect(response).to render_template('backends/new')
+      expect(response).to render_template('active_admin/resource/new')
     end
 
     it 'presents ldap backend new' do
       get :new, type: 'LdapBackend'
-      expect(response).to render_template('backends/new')
+      expect(response).to render_template('active_admin/resource/new')
     end
 
     it 'deletes ldap backend' do
