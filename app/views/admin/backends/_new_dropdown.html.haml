@@ -5,11 +5,11 @@
       %b.caret
     %ul.dropdown-menu{:style => "right: 0; left: auto;"}
       %li
-        %a{ href: "#{new_admin_backend_path(type: 'DeviseBackend')}", style: "color: #555; background-color: transparent; border-color: transparent;" }
+        %a{ href: "#{new_admin_backend_path(type: 'DeviseBackend')}", style: "#{dropdown_link_style}" }
           DeviseBackend
       %li
-        %a{ href: "#{new_admin_backend_path(type: 'LdapBackend')}", style: "color: #555; background-color: transparent; border-color: transparent;" }
+        %a{ href: "#{new_admin_backend_path(type: 'LdapBackend')}", style: "#{dropdown_link_style}" }
           LdapBackend
       %li
-        %a{ href: "#{new_admin_backend_path(type: 'ActiveDirectoryBackend')}", style: "color: #555; background-color: transparent; border-color: transparent;" }
+        %a{ href: "#{new_admin_backend_path(type: 'ActiveDirectoryBackend')}", style: "#{dropdown_link_style}" }
           ActiveDirectoryBackend
