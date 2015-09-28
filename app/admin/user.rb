@@ -25,4 +25,14 @@ ActiveAdmin.register User do
     f.actions
   end
 
+  controller do
+
+    private
+
+    def authenticate_user!
+      redirect_to(root_path) unless current_user && current_user.admin
+    end
+
+  end
+
 end
