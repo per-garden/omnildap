@@ -26,6 +26,10 @@ ActiveAdmin.register Backend do
   filter :domain
   filter :users
 
+  show do
+    render partial: 'show'
+  end
+
   form do |f|
     # ActiveAdmin madness! Already fetched in controller!
     if params[:type] == 'DeviseBackend'
@@ -67,6 +71,10 @@ ActiveAdmin.register Backend do
       else
         redirect_to admin_backends_path
       end
+    end
+
+    def show
+      @backend = Backend.find(params[:id])
     end
   
     private
