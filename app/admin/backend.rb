@@ -46,6 +46,7 @@ ActiveAdmin.register Backend do
       else
         @backend = Backend.new(type: params[:type])
       end
+      @page_title = "New #{@backend.type}"
     end
 
     private
