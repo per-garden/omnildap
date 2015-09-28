@@ -47,10 +47,11 @@ ActiveAdmin.register Backend do
       if params[:type] == 'DeviseBackend'
         # Singleton!
         @backend = DeviseBackend.instance
+        @page_title = "Update #{@backend.type}"
       else
         @backend = Backend.new(type: params[:type])
+        @page_title = "New #{@backend.type}"
       end
-      @page_title = "New #{@backend.type}"
     end
 
     def create
@@ -76,6 +77,39 @@ ActiveAdmin.register Backend do
     def show
       @backend = Backend.find(params[:id])
     end
+
+    def update
+      type = params.keys[3]
+      case type
+      when 'devise_backend'
+        backend = Backend.find(params[:id])
+        backend.update(devise_backend_params)
+      when 'ldap_backend'
+        backend = Backend.find(params[:id])
+        backend.update(ldap_backend_params)
+      when 'active_directory_backend'
+        backend = Backend.find(params[:id])
+        backend.update(active_directory_backend_params)
+      end
+  
+      if backend && backend.save
+        redirect_to admin_backend_path(backend), notice: 'Authentication backend was updated.'
+      else
+        redirect_to admin_backends_path
+      end
+    end
+
+    def destroy
+      backend = Backend.find(params[:id])
+      notice = ''
+      if backend && backend.destroy
+        notice = 'Backend deleted'
+      else
+        notice = "Unable to delete backend #{backend.name_string}"
+      end
+      redirect_to admin_backends_path, notice: notice
+    end
+
   
     private
   
