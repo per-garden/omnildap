@@ -1,6 +1,8 @@
 .col-md-6
   .panel.panel-default
     .panel-heading
-      Type: #{@backend.type}
-    %ul.well-list
+      Type:
+      %strong
+        = @backend.type
+    %ul.well-list{:style => "margin: 0; padding: 0; list-style: none;"}
       = render type_show(@backend.type)

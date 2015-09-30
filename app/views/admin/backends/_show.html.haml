@@ -5,16 +5,16 @@
         Name:
         %strong
           = @backend.name_string
-      %ul.well-list
-        %li
+      %ul.well-list{:style => "margin: 0; padding: 0; list-style: none;"}
+        %li.well-sm
           %span.light Description:
           %strong
             = @backend.description || ''
-        %li
+        %li.well-sm
           %span.light Email pattern:
           %strong
             = @backend.email_pattern
-        %li
+        %li.well-sm
           %span.light Blocked:
           %strong
             = @backend.blocked
