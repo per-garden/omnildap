@@ -14,7 +14,7 @@ ActiveAdmin.register Backend do
     actions
   end
 
-  filter :type, as: :select, collection: -> {Backend.all.map{|s| s.type}.uniq}
+  filter :type, as: :select, collection: -> { ["DeviseBackend", "LdapBackend", "ActiveDirectoryBackend"] }
   filter :name
   filter :description
   filter :host
