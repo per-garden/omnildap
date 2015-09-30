@@ -22,15 +22,15 @@ ActiveAdmin.register User do
   end
 
   form do |f|
-    f.inputs "Admin Details" do
-      f.input :email
-      f.input :password
-      f.input :password_confirmation
-    end
-    f.actions
+    render partial: 'form'
   end
 
   controller do
+
+    def new
+      @user = User.new
+      @user.backends << DeviseBackend.instance
+    end
 
     def show
       @user = User.find(params[:id])

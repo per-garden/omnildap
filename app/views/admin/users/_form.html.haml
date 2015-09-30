@@ -1,0 +1,36 @@
+.row
+  = form_for [:user, @user], url: { controller: 'users', action: @action }, html: { class: 'form-horizontal fieldset-form' } do |f|
+    .col-md-6
+      %fieldset
+  
+      .form-group
+        %span.light Name:
+        = f.text_field :name, autocomplete: "off", class: 'form-control'
+      .form-group
+        %span.light Email:
+        = f.text_area :email, autocomplete: "off", class: 'form-control'
+      .form-group
+        %span.light password:
+        = f.password_field :password, autocomplete: "off", class: 'form-control'
+      .form-group
+        %span.light Password confirmation:
+        = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
+
+    .col-md-6
+      %fieldset
+
+      .form-group
+        %span.light Admin:
+        = f.check_box :admin
+      .form-group
+        %span.light Blocked:
+        = f.check_box :blocked
+  
+    .col-md-12.row
+      .form-actions
+        - if @user.new_record?
+          = f.submit 'Create', class: "btn btn-create"
+          = link_to 'Cancel', admin_users_path, class: "btn btn-cancel"
+        - else
+          = f.submit 'Save', class: "btn btn-save"
+          = link_to 'Cancel', admin_users_path, class: "btn btn-cancel"
