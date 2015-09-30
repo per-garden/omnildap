@@ -1,0 +1,21 @@
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading
+        Name:
+        %strong
+          = @user.name
+      %ul.well-list{:style => "margin: 0; padding: 0; list-style: none;"}
+        %li.well-sm
+          %span.light Email:
+          %strong
+            = @user.email || ''
+        %li.well-sm
+          %span.light Admin:
+          %strong
+            = @user.admin
+        %li.well-sm
+          %span.light Blocked:
+          %strong
+            = @user.blocked
+  = render 'details'

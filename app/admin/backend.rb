@@ -6,6 +6,14 @@ ActiveAdmin.register Backend do
     render partial: 'new_dropdown'
   end
 
+  action_item 'edit', only: :show do
+    link_to 'Edit Backend', edit_admin_backend_path
+  end
+
+  action_item 'delete', only: :show do
+    link_to 'Delete Backend', admin_backend_path, method: :delete
+  end
+
   index do
     column :type
     column :name_string

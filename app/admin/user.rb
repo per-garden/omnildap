@@ -11,10 +11,15 @@ ActiveAdmin.register User do
     actions
   end
 
+  filter :name
   filter :email
-  filter :current_sign_in_at
-  filter :sign_in_count
-  filter :created_at
+  filter :admin
+  filter :email
+  filter :blocked
+
+  show do
+    render partial: 'show'
+  end
 
   form do |f|
     f.inputs "Admin Details" do
@@ -26,6 +31,10 @@ ActiveAdmin.register User do
   end
 
   controller do
+
+    def show
+      @user = User.find(params[:id])
+    end
 
     private
 

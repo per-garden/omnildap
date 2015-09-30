@@ -1,0 +1,19 @@
+.col-md-6
+  .panel.panel-default
+    %ul.well-list{:style => "margin: 0; padding: 0; list-style: none;"}
+      %li.well-sm
+        %span.light Created At:
+        %strong
+          = @user.created_at || ''
+      %li.well-sm
+        %span.light Updated At:
+        %strong
+          = @user.updated_at
+      %li.well-sm
+        %span.light Sign In Count:
+        %strong
+          = @user.sign_in_count
+      %li.well-sm
+        %span.light Last Sign In At:
+        %strong
+          = @user.last_sign_in_at
