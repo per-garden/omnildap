@@ -17,3 +17,7 @@
         %span.light Last Sign In At:
         %strong
           = @user.last_sign_in_at
+      %li.well-sm
+        %span.light Backends:
+        %strong
+          = @user.backends.map {|b| b.name_string}.join(',')

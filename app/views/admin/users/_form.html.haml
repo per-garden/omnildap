@@ -9,12 +9,13 @@
       .form-group
         %span.light Email:
         = f.text_area :email, autocomplete: "off", class: 'form-control'
-      .form-group
-        %span.light password:
-        = f.password_field :password, autocomplete: "off", class: 'form-control'
-      .form-group
-        %span.light Password confirmation:
-        = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
+      - if @user.new_record?
+        .form-group
+          %span.light password:
+          = f.password_field :password, autocomplete: "off", class: 'form-control'
+        .form-group
+          %span.light Password confirmation:
+          = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
 
     .col-md-6
       %fieldset
