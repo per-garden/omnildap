@@ -70,8 +70,6 @@ module Omnildap
       result = {}
       User.all.each do |u|
         entry = {}
-        # entry['sn'] = 'Fred Flintstone'
-        # entry['userpassword'] = 'gnA11arg'
         entry['cn'] = u.name
         entry['mail'] = u.email
         result["cn=#{u.name},#{@basedn}"] = entry

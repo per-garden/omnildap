@@ -16,5 +16,10 @@ FactoryGirl.define do
     factory :admin do
       admin true
     end
+
+    factory :ldap_user do
+      backends []
+    end
   end
+
 end
