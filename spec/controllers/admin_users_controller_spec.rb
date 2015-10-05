@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe Admin::UsersController do
   before do
-    @any_user = FactoryGirl.build(:user)
+    @any_user = FactoryGirl.build(:devise_user)
     @any_user.save!
   end
 
   describe "regular user GET" do
     before do
       @request.env['devise.mapping'] = Devise.mappings[:user]
-      @user = create(:user)
+      @user = create(:devise_user)
       sign_in @user
     end
 
@@ -40,7 +40,7 @@ describe Admin::UsersController do
       @request.env['devise.mapping'] = Devise.mappings[:admin]
       @admin = create(:admin)
       sign_in @admin
-      @deletable_any_user = FactoryGirl.build(:user)
+      @deletable_any_user = FactoryGirl.build(:devise_user)
       @deletable_any_user.save!
     end
 

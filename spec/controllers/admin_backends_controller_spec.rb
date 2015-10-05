@@ -9,7 +9,7 @@ describe Admin::BackendsController do
   describe "regular user GET" do
     before do
       @request.env['devise.mapping'] = Devise.mappings[:user]
-      @user = create(:user)
+      @user = create(:devise_user)
       sign_in @user
     end
 

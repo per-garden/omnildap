@@ -2,10 +2,13 @@ require 'spec_helper'
 require 'sidekiq/testing'
 
 describe Backend do
-  it "has a valid factory" do
-    expect(DeviseBackend.instance).to be_valid
-    expect(build :ldap_backend).to be_valid
-    expect(build :active_directory_backend).to be_valid
+  it "it does not have any valid factory (abstract class)" do
+    begin
+      b = FactoryGirl.build(:backend)
+    rescue
+      # Expecting this to fail
+    end
+    expect(b).to be_nil
   end
 
   describe 'using devise backend' do
@@ -13,7 +16,7 @@ describe Backend do
       @devise_backend = DeviseBackend.instance
       @devise_backend.name = Faker::Company.name
       # User factory automatically adds ':user' to singleton DeviseBackend
-      @user = FactoryGirl.build(:user)
+      @user = FactoryGirl.build(:devise_user)
       # Saving first user should be OK
       @user.save!
       DeviseBackend.instance.users << @user
@@ -21,7 +24,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user name within backend' do
-      @another_user = FactoryGirl.build(:user, name: @user.name)
+      @another_user = FactoryGirl.build(:devise_user, name: @user.name)
       begin
         @another_user.save!
         DeviseBackend.instance.users << @another_user
@@ -34,7 +37,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user email within backend' do
-      @another_user = FactoryGirl.build(:user, email: @user.email)
+      @another_user = FactoryGirl.build(:devise_user, email: @user.email)
       begin
         @another_user.save!
         DeviseBackend.instance.users << @another_user
@@ -67,7 +70,7 @@ describe Backend do
     end
 
     before(:each) do
-      @user = FactoryGirl.build(:ldap_user)
+      @user = FactoryGirl.build(:user)
       # Saving first user should be OK
       @server.add_user("cn=#{@user.name},#{@ldap_backend.base}" ,"#{@user.password}", "#{@user.email}")
       # Backend sync
@@ -77,7 +80,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user name within backend' do
-      @another_user = FactoryGirl.build(:ldap_user, name: @user.name)
+      @another_user = FactoryGirl.build(:user, name: @user.name)
       begin
         @server.add_user("cn=#{@another_user.name},#{@ldap_backend.base}" ,"#{@another_user.password}", "#{@another_user.email}")
         # Backend sync
@@ -92,7 +95,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user email within backend' do
-      @another_user = FactoryGirl.build(:ldap_user, email: @user.email)
+      @another_user = FactoryGirl.build(:user, email: @user.email)
       begin
         @server.add_user("cn=#{@another_user.name},#{@ldap_backend.base}" ,"#{@another_user.password}", "#{@another_user.email}")
         # Backend sync

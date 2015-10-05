@@ -19,7 +19,7 @@ describe Omnildap::LdapServer do
   
   describe 'using devise backend' do
     before(:all) do
-      @user = FactoryGirl.build(:user)
+      @user = FactoryGirl.build(:devise_user)
       @user.backends << @devise_backend
       @user.save!
       @blocked_user = FactoryGirl.build(:blocked_user)

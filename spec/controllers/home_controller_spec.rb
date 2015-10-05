@@ -8,7 +8,7 @@ describe HomeController do
     end
 
     it 'lets user log in' do
-      user = create(:user)
+      user = create(:devise_user)
       sign_in user
       get :index, {}, {SERVER_NAME:'localhost:3003'}
       expect(response).to render_template('home/index')
