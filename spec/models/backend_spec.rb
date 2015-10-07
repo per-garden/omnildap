@@ -2,6 +2,15 @@ require 'spec_helper'
 require 'sidekiq/testing'
 
 describe Backend do
+  before(:all) do
+    @user = FactoryGirl.build(:devise_user)
+    @user.save!
+    @dual_backend_user = FactoryGirl.build(:devise_user)
+    @dual_backend_user.save!
+    DeviseBackend.instance.name = Faker::Company.name
+    DeviseBackend.instance.save!
+  end
+
   it "it does not have any valid factory (abstract class)" do
     begin
       b = FactoryGirl.build(:backend)
@@ -12,16 +21,6 @@ describe Backend do
   end
 
   describe 'using devise backend' do
-    before(:each) do
-      @devise_backend = DeviseBackend.instance
-      @devise_backend.name = Faker::Company.name
-      # User factory automatically adds ':user' to singleton DeviseBackend
-      @user = FactoryGirl.build(:devise_user)
-      # Saving first user should be OK
-      @user.save!
-      DeviseBackend.instance.users << @user
-      DeviseBackend.instance.save
-    end
 
     it 'does not allow duplicate user name within backend' do
       @another_user = FactoryGirl.build(:devise_user, name: @user.name)
@@ -32,8 +31,7 @@ describe Backend do
       rescue
         # Expecting this to fail
       end
-      # Expecting only first user to be saved
-      expect(@devise_backend.users).not_to include(@another_user)
+      expect(DeviseBackend.instance.users).not_to include(@another_user)
     end
 
     it 'does not allow duplicate user email within backend' do
@@ -45,14 +43,11 @@ describe Backend do
       rescue
         # Expecting this to fail
       end
-      # Expecting only first user to be saved
-      expect(@devise_backend.users).not_to include(@another_user)
+      expect(DeviseBackend.instance.users).not_to include(@another_user)
     end
 
     after(:each) do
-      @user ? @user.destroy : nil
       @another_user ? @another_user.destroy : nil
-      @devise_backend ? @devise_backend.destroy : nil
     end
   end
 
@@ -63,6 +58,11 @@ describe Backend do
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}", 'ldap_backend_admin@ldap_backend.name')
       @server.run_tcpserver
       @ldap_backend.save!
+      @user = FactoryGirl.build(:user)
+      @server.add_user("cn=#{@user.name},#{@ldap_backend.base}" ,"#{@user.password}", "#{@user.email}")
+      Sidekiq::Testing.inline! do
+        BackendSyncWorker.perform_async
+      end
       Sidekiq::Testing.inline! do
         LdapWorker.prepare
         LdapWorker.perform_async
@@ -71,46 +71,48 @@ describe Backend do
 
     before(:each) do
       @user = FactoryGirl.build(:user)
-      # Saving first user should be OK
       @server.add_user("cn=#{@user.name},#{@ldap_backend.base}" ,"#{@user.password}", "#{@user.email}")
-      # Backend sync
       Sidekiq::Testing.inline! do
         BackendSyncWorker.perform_async
       end
+    end
+
+    it 'allows user to belong to several backends' do
+      @server.add_user("cn=#{@dual_backend_user.name},#{@ldap_backend.base}" ,"#{@dual_backend_user.password}", "#{@dual_backend_user.email}")
+      Sidekiq::Testing.inline! do
+        BackendSyncWorker.perform_async
+      end
+      user = @dual_backend_user
+      expect(LdapBackend.find(@ldap_backend.id).users).to include(@dual_backend_user)
     end
 
     it 'does not allow duplicate user name within backend' do
       @another_user = FactoryGirl.build(:user, name: @user.name)
       begin
         @server.add_user("cn=#{@another_user.name},#{@ldap_backend.base}" ,"#{@another_user.password}", "#{@another_user.email}")
-        # Backend sync
         Sidekiq::Testing.inline! do
           BackendSyncWorker.perform_async
         end
       rescue
         # Expecting this to fail
       end
-      # Expecting only first user to be saved
-      expect(@ldap_backend.users).not_to include(@another_user)
+      expect(LdapBackend.find(@ldap_backend.id).users).not_to include(@another_user)
     end
 
     it 'does not allow duplicate user email within backend' do
       @another_user = FactoryGirl.build(:user, email: @user.email)
       begin
         @server.add_user("cn=#{@another_user.name},#{@ldap_backend.base}" ,"#{@another_user.password}", "#{@another_user.email}")
-        # Backend sync
         Sidekiq::Testing.inline! do
           BackendSyncWorker.perform_async
         end
       rescue
         # Expecting this to fail
       end
-      # Expecting only first user to be saved
-      expect(@ldap_backend.users).not_to include(@another_user)
+      expect(LdapBackend.find(@ldap_backend.id).users).not_to include(@another_user)
     end
 
     after(:each) do
-      @user ? @user.destroy : nil
       @another_user ? @another_user.destroy : nil
     end
 
@@ -118,5 +120,10 @@ describe Backend do
       @server.stop
       @ldap_backend ? @ldap_backend.destroy : nil
     end
+  end
+
+  after(:all) do
+    User.destroy_all
+    Backend.destroy_all
   end
 end
