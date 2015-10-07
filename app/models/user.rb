@@ -13,6 +13,10 @@ class User < ActiveRecord::Base
     backends.each do |b|
       result ||= b.authenticate(name, password)
     end
+    unless result
+      result = DeviseBackend.instance.authenticate(name, password)
+      backends << DeviseBackend.instance if result
+    end
     result
   end
 
