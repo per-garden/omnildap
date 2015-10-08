@@ -1,0 +1,13 @@
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading
+        Name:
+        %strong
+          = @group.name
+      %ul.well-list{:style => "margin: 0; padding: 0; list-style: none;"}
+        %li.well-sm
+          %span.light Created at:
+          %strong
+            = @group.created_at
+  = render 'details'
