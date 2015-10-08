@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
     backends.each do |b|
       result ||= b.authenticate(name, password)
     end
-    unless result
+    if !result && DeviseBackend.instance.signup_enabled
       result = DeviseBackend.instance.authenticate(name, password)
       backends << DeviseBackend.instance if result
     end
