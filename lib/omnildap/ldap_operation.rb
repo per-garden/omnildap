@@ -10,6 +10,7 @@ module Omnildap
       @basedn = Rails.application.config.ldap_basedn
       @hash = hash
       @hash.merge!(load_users)
+      @hash.merge!(load_groups)
     end
 
     def simple_bind(version, dn, password)
@@ -54,7 +55,11 @@ module Omnildap
         @hash.keys.each do |key|
           entry = @hash[key]
           if Omnildap::LdapFilter.run(filter, entry)
-            send_SearchResultEntry("cn=#{entry['cn']}," + basedn, entry)
+            if entry['mail']
+              send_SearchResultEntry("cn=#{entry['cn']},ou=users," + basedn, entry)
+            else
+              send_SearchResultEntry("cn=#{entry['cn']},ou=groups," + basedn, entry)
+            end
           end
         end
       when 3
@@ -73,6 +78,16 @@ module Omnildap
         entry['cn'] = u.name
         entry['mail'] = u.email
         result["cn=#{u.name},#{@basedn}"] = entry
+      end
+      result
+    end
+
+    def load_groups
+      result = {}
+      Group.all.each do |g|
+        entry = {}
+        entry['cn'] = g.name
+        result["cn=#{g.name},#{@basedn}"] = entry
       end
       result
     end

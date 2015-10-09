@@ -105,7 +105,7 @@ describe Omnildap::LdapServer do
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}", 'ldap_backend_admin@ldap_backend.name')
       @server.add_user("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
       # TODO: Make filtering work properly
-      @filter = Net::LDAP::Filter.eq( :objectclass, '*' )
+      @filter = Net::LDAP::Filter.eq( :cn, '*' )
       Sidekiq::Testing.inline! do
         BackendSyncWorker.perform_async
       end
@@ -142,7 +142,6 @@ describe Omnildap::LdapServer do
       entries.each do |e|
         result << e[:cn][0]
       end
-      # expect(result).to include("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}")
       expect(result).to include("#{@ldap_backend_user.name}")
     end
 
@@ -194,6 +193,35 @@ describe Omnildap::LdapServer do
 
     after(:all) do
       @server.stop
+    end
+  end
+
+  describe 'group handling' do
+    before(:all) do
+      @group = FactoryGirl.build(:group)
+      @group_user = FactoryGirl.build(:devise_user)
+      @deletable_group_user = FactoryGirl.build(:devise_user)
+      @deletable_group_user.groups << @group
+      @deletable_group_user.save!
+      @filter = Net::LDAP::Filter.eq( :cn, '*' )
+    end
+
+    describe 'as admin' do
+      it 'lists groups' do
+        @client.authenticate(@admin.name, @admin.password)
+        expect(@client.bind).to be_truthy
+        base = "cn=#{@group.name},#{Rails.application.config.ldap_basedn}"
+        entries = @client.search(base: base, filter: @filter)
+        result = []
+        entries.each do |e|
+          result << e[:cn][0]
+        end
+        expect(result).to include("#{@group.name}")
+      end
+    end
+
+    after(:all) do
+      Group.destroy_all
     end
   end
 
