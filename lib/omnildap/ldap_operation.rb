@@ -55,10 +55,10 @@ module Omnildap
         @hash.keys.each do |key|
           entry = @hash[key]
           if Omnildap::LdapFilter.run(filter, entry)
-            if entry['mail']
-              send_SearchResultEntry("cn=#{entry['cn']},ou=users," + basedn, entry)
+            if key.include?(',ou=users,')
+              send_SearchResultEntry(key, entry)
             else
-              send_SearchResultEntry("cn=#{entry['cn']},ou=groups," + basedn, entry)
+              send_SearchResultEntry(key, entry)
             end
           end
         end
@@ -77,7 +77,14 @@ module Omnildap
         entry = {}
         entry['cn'] = u.name
         entry['mail'] = u.email
-        result["cn=#{u.name},#{@basedn}"] = entry
+        if u.groups[0]
+          groups = []
+          u.groups.each do |g|
+            groups << "cn=#{g.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+          end
+          entry['memberof'] = groups
+        end
+        result["cn=#{u.name},ou=users,#{@basedn}"] = entry
       end
       result
     end
@@ -87,7 +94,14 @@ module Omnildap
       Group.all.each do |g|
         entry = {}
         entry['cn'] = g.name
-        result["cn=#{g.name},#{@basedn}"] = entry
+        if g.users[0]
+          members = []
+          g.users.each do |u|
+            members << "cn=#{u.name},ou=users,#{Rails.application.config.ldap_basedn}"
+          end
+          entry['member'] = members
+        end
+        result["cn=#{g.name},ou=groups,#{@basedn}"] = entry
       end
       result
     end

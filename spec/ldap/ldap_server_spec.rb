@@ -199,26 +199,104 @@ describe Omnildap::LdapServer do
   describe 'group handling' do
     before(:all) do
       @group = FactoryGirl.build(:group)
-      @group_user = FactoryGirl.build(:devise_user)
-      @deletable_group_user = FactoryGirl.build(:devise_user)
-      @deletable_group_user.groups << @group
-      @deletable_group_user.save!
+      @group_user = FactoryGirl.create(:devise_user)
+      @group_user.groups << @group
+      @group.save!
       @filter = Net::LDAP::Filter.eq( :cn, '*' )
     end
 
-    describe 'as admin' do
-      it 'lists groups' do
-        @client.authenticate(@admin.name, @admin.password)
-        expect(@client.bind).to be_truthy
-        base = "cn=#{@group.name},#{Rails.application.config.ldap_basedn}"
-        entries = @client.search(base: base, filter: @filter)
-        result = []
-        entries.each do |e|
-          result << e[:cn][0]
-        end
-        expect(result).to include("#{@group.name}")
+    it 'lists groups' do
+      @client.authenticate(@group_user.name, @group_user.password)
+      expect(@client.bind).to be_truthy
+      base = "cn=#{@group.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:cn][0]
       end
+      expect(result).to include("#{@group.name}")
     end
+
+   describe 'adding' do
+     before(:each) do
+       @addable_group_user = FactoryGirl.create(:devise_user)
+       @addable_group_user.groups << @group
+       @group.save!
+     end
+
+     it 'gives group member' do
+       group_dn = "cn=#{@group.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+       @client.authenticate(@group_user.name, @group_user.password)
+       base = group_dn
+       entries = @client.search(base: base, filter: @filter)
+       result = []
+       entries.each do |e|
+         result = e[:member] if e[:dn][0] == group_dn
+       end
+       addable_group_user_dn = "cn=#{@addable_group_user.name},ou=users,#{Rails.application.config.ldap_basedn}"
+       expect(result).to include(addable_group_user_dn)
+     end
+
+     it 'makes user member of group' do 
+       addable_group_user_dn = "cn=#{@addable_group_user.name},ou=users,#{Rails.application.config.ldap_basedn}"
+       base = addable_group_user_dn
+       entries = @client.search(base: base, filter: @filter)
+       result = []
+       entries.each do |e|
+         result = e[:memberof] if e[:dn][0] == addable_group_user_dn
+       end
+       group_dn = "cn=#{@group.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+       expect(result).to include(group_dn)
+     end
+
+     after(:each) do
+       @addable_group_user.groups.delete(@group)
+       @group.save!
+     end
+   end
+
+   describe 'removing' do
+     before(:each) do
+       @deletable_group_user = FactoryGirl.build(:devise_user)
+       @deletable_group_user.groups << @group
+       @deletable_group_user.save!
+     end
+
+     it 'removes member from group' do
+       @deletable_group_user.groups.delete(@group)
+       @group.save!
+       group_dn = "cn=#{@group.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+       @client.authenticate(@group_user.name, @group_user.password)
+       base = group_dn
+       entries = @client.search(base: base, filter: @filter)
+       result = []
+       entries.each do |e|
+         result = e[:member] if e[:dn][0] == group_dn
+       end
+       deletable_group_user_dn = "cn=#{@deletable_group_user.name},ou=users,#{Rails.application.config.ldap_basedn}"
+       expect(result).not_to include(deletable_group_user_dn)
+     end
+
+     it 'makes user not be member of group' do
+       @deletable_group_user.groups.delete(@group)
+       @group.save!
+       deletable_group_user_dn = "cn=#{@deletable_group_user.name},ou=users,#{Rails.application.config.ldap_basedn}"
+       @client.authenticate(@group_user.name, @group_user.password)
+       base = deletable_group_user_dn
+       entries = @client.search(base: base, filter: @filter)
+       result = []
+       entries.each do |e|
+         result = e[:memberof] if e[:dn][0] == deletable_group_user_dn
+       end
+       group_dn = "cn=#{@group.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+       expect(result).not_to include(deletable_group_user_dn)
+     end
+
+     after(:each) do
+       @deletable_group_user.groups.delete(@group)
+       @deletable_group_user.save!
+     end
+   end
 
     after(:all) do
       Group.destroy_all
