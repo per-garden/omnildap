@@ -27,6 +27,10 @@ ActiveAdmin.register Group do
 
     def create
       group = Group.new(group_create_params)
+      params[:group][:users].each do |uid|
+        u = User.find(uid.to_i)
+        group.users << u if u
+      end
       if group && group.save!
         redirect_to admin_group_path(group), notice: 'Group was created.'
       else
@@ -41,6 +45,12 @@ ActiveAdmin.register Group do
     def update
       group = Group.find(params[:id])
       group.update(group_update_params)
+      users = []
+      params[:group][:users].each do |uid|
+        u = User.find(uid.to_i)
+        users << u
+      end
+      group.users = users
 
       if group && group.save
         redirect_to admin_group_path(group), notice: 'Group was updated.'
@@ -67,11 +77,11 @@ ActiveAdmin.register Group do
     end
 
     def group_create_params
-      params.require(:group).permit(:name)
+      params.require(:group).permit(:name, :users)
     end
 
     def group_update_params
-      params.require(:group).permit(:name)
+      params.require(:group).permit(:name, :users)
     end
 
   end

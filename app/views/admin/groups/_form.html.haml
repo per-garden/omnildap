@@ -1,0 +1,28 @@
+.row
+  = form_for [:group, @group], url: { controller: 'groups', action: @action }, html: { class: 'form-horizontal fieldset-form' } do |f|
+    .col-md-6
+      %fieldset
+  
+      .form-group
+        %span.light Name:
+        = f.text_field :name, autocomplete: "off", class: 'form-control'
+
+    .col-md-6
+      %fieldset
+
+      .form-group
+        %span.light Users:
+        %br
+        - User.all.each do |u|
+          = f.check_box(:users, { checked: member(u.id), multiple: true }, u.id, nil)
+          = "#{u.name} - #{u.email}"
+          %br
+
+    .col-md-12.row
+      .form-actions
+        - if @group.new_record?
+          = f.submit 'Create', class: "btn btn-create"
+          = link_to 'Cancel', admin_groups_path, class: "btn btn-cancel"
+        - else
+          = f.submit 'Save', class: "btn btn-save"
+          = link_to 'Cancel', admin_groups_path, class: "btn btn-cancel"
