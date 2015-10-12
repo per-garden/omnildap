@@ -20,4 +20,4 @@
       %li.well-sm
         %span.light Backends:
         %strong
-          = @user.backends.map {|b| b.name_string}.join(',')
+          = @user.backends.map {|b| b.name_string}.join(', ')
