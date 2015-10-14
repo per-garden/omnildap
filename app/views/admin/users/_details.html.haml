@@ -21,3 +21,7 @@
         %span.light Backends:
         %strong
           = @user.backends.map {|b| b.name_string}.join(', ')
+      %li.well-sm
+        %span.light Groups:
+        %strong
+          = @user.groups.map {|g| g.name}.join(', ')

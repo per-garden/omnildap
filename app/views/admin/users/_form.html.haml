@@ -8,7 +8,7 @@
         = f.text_field :name, autocomplete: "off", class: 'form-control'
       .form-group
         %span.light Email:
-        = f.text_area :email, autocomplete: "off", class: 'form-control'
+        = f.text_field :email, autocomplete: "off", class: 'form-control'
       - if @user.new_record?
         .form-group
           %span.light password:
@@ -16,7 +16,6 @@
         .form-group
           %span.light Password confirmation:
           = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
-
     .col-md-6
       %fieldset
 
@@ -26,6 +25,20 @@
       .form-group
         %span.light Blocked:
         = f.check_box :blocked
+
+      .form-group
+        %span.light Groups:
+        %p
+          %table.table.table-striped.table-bordered{:cellspacing => "0", :width => "100%"}
+            %thead
+              %tr.light
+                %th Member of
+            %tbody
+              - Group.all.each do |g|
+                %tr
+                  %td
+                    = f.check_box(:groups, { checked: member_of(g.id), multiple: true }, g.id, nil)
+                    = "#{g.name}"
   
     .col-md-12.row
       .form-actions

@@ -3,5 +3,15 @@
     %ul.well-list{:style => "margin: 0; padding: 0; list-style: none;"}
       %li.well-sm
         %span.light Users:
-        %strong
-          = @group.users.map {|u| u.name}.join(', ')
+        %p
+          %table.table.table-striped.table-bordered{:cellspacing => "0", :width => "100%"}
+            %thead
+              %tr.light
+                %th Name
+                %th Email
+            %tbody
+              - @group.users.each do |u|
+                %tr
+                  %td #{u.name}
+                  %td #{u.email}
+

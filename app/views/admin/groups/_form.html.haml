@@ -12,11 +12,19 @@
 
       .form-group
         %span.light Users:
-        %br
-        - User.all.each do |u|
-          = f.check_box(:users, { checked: member(u.id), multiple: true }, u.id, nil)
-          = "#{u.name} - #{u.email}"
-          %br
+        %p
+          %table.table.table-striped.table-bordered{:cellspacing => "0", :width => "100%"}
+            %thead
+              %tr.light
+                %th Member
+                %th Name - Email
+            %tbody
+              - User.all.each do |u|
+                %tr
+                  %td
+                    = f.check_box(:users, { checked: member(u.id), multiple: true }, u.id, nil)
+                  %td
+                    = "#{u.name} - #{u.email}"
 
     .col-md-12.row
       .form-actions
