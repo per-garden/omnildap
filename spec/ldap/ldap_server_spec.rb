@@ -60,6 +60,45 @@ describe Omnildap::LdapServer do
       end
     end
 
+    it 'finds user based on cn' do
+      @client.authenticate(@admin.name, @admin.password)
+      expect(@client.bind).to be_truthy
+      base = "#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :cn, "#{@user.name}" )
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:cn][0]
+      end
+      expect(result).to include("#{@user.name}")
+    end
+
+    it "finds user based on email" do
+      @client.authenticate(@admin.name, @admin.password)
+      expect(@client.bind).to be_truthy
+      base = "#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :mail, "#{@user.email}" )
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:mail][0]
+      end
+      expect(result).to include("#{@user.email}")
+    end
+
+    it 'finds user based on samaccountname' do
+      @client.authenticate(@admin.name, @admin.password)
+      expect(@client.bind).to be_truthy
+      base = "#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :samaccountname, "#{@user.name}" )
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:samaccountname][0]
+      end
+      expect(result).to include("#{@user.name}")
+    end
+
     describe 'when backend blocked' do
       before do
         @devise_backend.blocked = true
@@ -104,8 +143,6 @@ describe Omnildap::LdapServer do
       @server.run_tcpserver
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}", 'ldap_backend_admin@ldap_backend.name')
       @server.add_user("cn=#{@ldap_backend_user.name},#{@ldap_backend.base}" ,"#{@ldap_backend_user.password}", "#{@ldap_backend_user.email}")
-      # TODO: Make filtering work properly
-      @filter = Net::LDAP::Filter.eq( :cn, '*' )
       Sidekiq::Testing.inline! do
         BackendSyncWorker.perform_async
       end
@@ -133,10 +170,11 @@ describe Omnildap::LdapServer do
       end
     end
 
-    it 'finds backend user based on cn' do
+    it 'finds user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
       base = "#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :cn, "#{@ldap_backend_user.name}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
       entries.each do |e|
@@ -145,16 +183,30 @@ describe Omnildap::LdapServer do
       expect(result).to include("#{@ldap_backend_user.name}")
     end
 
-    it "finds backend user based on email" do
+    it "finds user based on email" do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
       base = "#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :mail, "#{@ldap_backend_user.email}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
       entries.each do |e|
         result << e[:mail][0]
       end
       expect(result).to include("#{@ldap_backend_user.email}")
+    end
+
+    it 'finds user based on samaccountname' do
+      @client.authenticate(@admin.name, @admin.password)
+      expect(@client.bind).to be_truthy
+      base = "#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :samaccountname, "#{@ldap_backend_user.name}" )
+      entries = @client.search(base: base, filter: @filter)
+      result = []
+      entries.each do |e|
+        result << e[:samaccountname][0]
+      end
+      expect(result).to include("#{@ldap_backend_user.name}")
     end
 
     describe 'when backend blocked' do

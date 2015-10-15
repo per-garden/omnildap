@@ -77,6 +77,7 @@ module Omnildap
         entry = {}
         entry['cn'] = u.name
         entry['mail'] = u.email
+        entry['samaccountname'] = u.name
         if u.groups[0]
           groups = []
           u.groups.each do |g|
