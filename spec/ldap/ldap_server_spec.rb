@@ -63,7 +63,7 @@ describe Omnildap::LdapServer do
     it 'finds user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
-      base = "#{Rails.application.config.ldap_basedn}"
+      base = "ou=users,#{Rails.application.config.ldap_basedn}"
       @filter = Net::LDAP::Filter.eq( :cn, "#{@user.name}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -76,7 +76,7 @@ describe Omnildap::LdapServer do
     it "finds user based on email" do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
-      base = "#{Rails.application.config.ldap_basedn}"
+      base = "ou=users,#{Rails.application.config.ldap_basedn}"
       @filter = Net::LDAP::Filter.eq( :mail, "#{@user.email}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -89,7 +89,7 @@ describe Omnildap::LdapServer do
     it 'finds user based on samaccountname' do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
-      base = "#{Rails.application.config.ldap_basedn}"
+      base = "ou=users,#{Rails.application.config.ldap_basedn}"
       @filter = Net::LDAP::Filter.eq( :samaccountname, "#{@user.name}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -173,7 +173,7 @@ describe Omnildap::LdapServer do
     it 'finds user based on cn' do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
-      base = "#{Rails.application.config.ldap_basedn}"
+      base = "ou=users,#{Rails.application.config.ldap_basedn}"
       @filter = Net::LDAP::Filter.eq( :cn, "#{@ldap_backend_user.name}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -186,7 +186,7 @@ describe Omnildap::LdapServer do
     it "finds user based on email" do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
-      base = "#{Rails.application.config.ldap_basedn}"
+      base = "ou=users,#{Rails.application.config.ldap_basedn}"
       @filter = Net::LDAP::Filter.eq( :mail, "#{@ldap_backend_user.email}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -199,7 +199,7 @@ describe Omnildap::LdapServer do
     it 'finds user based on samaccountname' do
       @client.authenticate(@admin.name, @admin.password)
       expect(@client.bind).to be_truthy
-      base = "#{Rails.application.config.ldap_basedn}"
+      base = "ou=users,#{Rails.application.config.ldap_basedn}"
       @filter = Net::LDAP::Filter.eq( :samaccountname, "#{@ldap_backend_user.name}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
@@ -257,10 +257,11 @@ describe Omnildap::LdapServer do
       @filter = Net::LDAP::Filter.eq( :cn, '*' )
     end
 
-    it 'lists groups' do
+    it 'finds group based on name' do
       @client.authenticate(@group_user.name, @group_user.password)
       expect(@client.bind).to be_truthy
-      base = "cn=#{@group.name},ou=groups,#{Rails.application.config.ldap_basedn}"
+      base = "ou=groups,#{Rails.application.config.ldap_basedn}"
+      @filter = Net::LDAP::Filter.eq( :cn, "#{@group.name}" )
       entries = @client.search(base: base, filter: @filter)
       result = []
       entries.each do |e|
