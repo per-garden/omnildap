@@ -4,6 +4,8 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
   validates_presence_of :name, :email
+  validates_format_of :email, :with => /@/
+  validates_format_of :name, :without => /@/
   has_and_belongs_to_many :backends
   has_and_belongs_to_many :groups
   validates_presence_of :backends, :message => 'must not be empty'
