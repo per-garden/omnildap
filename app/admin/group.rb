@@ -31,10 +31,10 @@ ActiveAdmin.register Group do
         u = User.find(uid.to_i)
         group.users << u if u
       end
-      if group && group.save!
+      if group && group.save
         redirect_to admin_group_path(group), notice: 'Group was created.'
       else
-        redirect_to admin_groups_path
+        redirect_to admin_groups_path, alert: 'Unable to create group'
       end      
     end
 
@@ -55,7 +55,7 @@ ActiveAdmin.register Group do
       if group && group.save
         redirect_to admin_group_path(group), notice: 'Group was updated.'
       else
-        redirect_to admin_groups_path
+        redirect_to admin_groups_path, alert: 'Unable to update group'
       end
     end
 

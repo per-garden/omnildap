@@ -22,6 +22,7 @@ ActiveAdmin.register Backend do
     actions
   end
 
+  filter :users_id, label: 'User', collection: proc { User.all.map {|u| ["#{u.name} - #{u.email}", u.id] } }, as: :select
   filter :type, as: :select, collection: -> { ["DeviseBackend", "LdapBackend", "ActiveDirectoryBackend"] }
   filter :name
   filter :description
@@ -75,10 +76,10 @@ ActiveAdmin.register Backend do
         backend = ActiveDirectoryBackend.new(active_directory_backend_params)
       end
   
-      if backend && backend.save!
-        redirect_to admin_backend_path(backend), notice: 'Authentication backend was created.'
+      if backend && backend.save
+        redirect_to admin_backend_path(backend), notice: 'Backend was created.'
       else
-        redirect_to admin_backends_path
+        redirect_to admin_backends_path, alert:  'Unable to create backend'
       end
     end
 
@@ -101,9 +102,9 @@ ActiveAdmin.register Backend do
       end
   
       if backend && backend.save
-        redirect_to admin_backend_path(backend), notice: 'Authentication backend was updated.'
+        redirect_to admin_backend_path(backend), notice: 'Backend was updated.'
       else
-        redirect_to admin_backends_path
+        redirect_to admin_backends_path, alert:  'Unable to update backend'
       end
     end
 

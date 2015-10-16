@@ -13,6 +13,7 @@ ActiveAdmin.register User do
   end
 
   filter :backends_id, label: 'Backend', collection: proc { Backend.all.map {|b| [b.name_string, b.id] } }, as: :select
+  filter :groups_id, label: 'Group', collection: proc { Group.all.map {|g| [g.name, g.id] } }, as: :select
   filter :name
   filter :email
   filter :admin
@@ -41,10 +42,10 @@ ActiveAdmin.register User do
         g = Group.find(gid.to_i)
         user.groups << g if g
       end
-      if user && user.save!
+      if user && user.save
         redirect_to admin_user_path(user), notice: 'User was created.'
       else
-        redirect_to admin_users_path
+        redirect_to admin_users_path, alert: 'Unable to create user'
       end      
     end
 
@@ -65,7 +66,7 @@ ActiveAdmin.register User do
       if user && user.save
         redirect_to admin_user_path(user), notice: 'User was updated.'
       else
-        redirect_to admin_users_path
+        redirect_to admin_users_path, alert: 'Unable to update user'
       end
     end
 
