@@ -26,27 +26,25 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0',          group: :doc
+gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Ransack and adds Rails 4 support :-)
 # Keep in mind that during the time where we use pre-release label, things can
 # break in each release! :-(
 gem 'activeadmin', '~> 1.0.0.pre1'
 
+gem 'faker'
 group :development, :test do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring' # , '1.3.1'
+  gem 'spring'
   gem 'erb2haml'
   gem 'rspec-rails'
   gem 'capybara'
   gem 'pry-rails'
   gem 'factory_girl_rails'
-  gem 'faker'
   gem 'fakeldap', '~> 0.1'
 end
 
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
 gem 'devise'
 gem 'net-ldap'
 
@@ -61,7 +59,6 @@ gem 'net-ldap'
 
 # Skeleton for implementing LDAP server applications
 gem 'deveo-ruby-ldapserver', '~> 0.5.2'
-# gem 'ruby-ldapserver', '~> 0.5.0'
 
 # Background jobs
 gem 'sidekiq', '~> 3.3'
