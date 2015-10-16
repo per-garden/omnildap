@@ -1,4 +1,5 @@
 class ActiveDirectoryBackend < LdapBackend
+  validates_presence_of :domain
 
   private
 
