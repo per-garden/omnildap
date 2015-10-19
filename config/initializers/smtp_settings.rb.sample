@@ -1,0 +1,11 @@
+if Rails.application.config.action_mailer.delivery_method == :smtp
+  ActionMailer::Base.smtp_settings = {
+    address: 'MAILSERVER',
+    port: 25,
+    # user_name: "omnildap",
+    # password: "omnildap",
+    # domain: "DOMAIN.COM",
+    # authentication: :login,
+    enable_starttls_auto: false
+  }
+end
