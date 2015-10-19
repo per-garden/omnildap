@@ -1,3 +1,5 @@
+require 'ldap/server/operation'
+
 module Omnildap
   class LdapOperation < LDAP::Server::Operation
 
