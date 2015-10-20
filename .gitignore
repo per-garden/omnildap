@@ -14,3 +14,10 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+
+# Ignore real life configurations
+config/secrets.yml
+config/environments/development.rb
+config/environments/test.rb
+config/environments/production.rb
+config/database.yml
