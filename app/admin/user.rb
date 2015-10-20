@@ -38,9 +38,11 @@ ActiveAdmin.register User do
     def create
       user = User.new(user_create_params)
       user.backends << DeviseBackend.instance
-      params[:user][:groups].each do |gid|
-        g = Group.find(gid.to_i)
-        user.groups << g if g
+      if params[:user][:groups]
+        params[:user][:groups].each do |gid|
+          g = Group.find(gid.to_i)
+          user.groups << g if g
+        end
       end
       if user && user.save
         redirect_to admin_user_path(user), notice: 'User was created.'
@@ -57,9 +59,11 @@ ActiveAdmin.register User do
       user = User.find(params[:id])
       user.update(user_update_params)
       groups = []
-      params[:user][:groups].each do |gid|
-        g = Group.find(gid.to_i)
-        groups << g
+      if params[:user][:groups]
+        params[:user][:groups].each do |gid|
+          g = Group.find(gid.to_i)
+          groups << g
+        end
       end
       user.groups = groups
 
