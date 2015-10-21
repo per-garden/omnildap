@@ -10,7 +10,7 @@ describe HomeController do
     it 'lets user log in' do
       user = create(:devise_user)
       sign_in user
-      get :index, {}, {SERVER_NAME:'localhost:3003'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}"}
       expect(response).to render_template('home/index')
     end
   end

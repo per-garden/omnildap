@@ -14,7 +14,7 @@ describe Admin::GroupsController do
     end
 
     it 'does not list groups' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/admin/groups'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}/admin/groups"}
       expect(response).to_not render_template('active_admin/resource/index')
     end
 
@@ -48,7 +48,7 @@ describe Admin::GroupsController do
     end
 
     it 'lists groups' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/admin/groups'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}/admin/groups"}
       expect(response).to render_template('active_admin/resource/index')
     end
 

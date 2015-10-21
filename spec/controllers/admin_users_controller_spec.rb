@@ -14,7 +14,7 @@ describe Admin::UsersController do
     end
 
     it 'does not list users' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/admin/users'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}/admin/users"}
       expect(response).to_not render_template('active_admin/resource/index')
     end
 
@@ -45,7 +45,7 @@ describe Admin::UsersController do
     end
 
     it 'lists users' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/admin/users'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}/admin/users"}
       expect(response).to render_template('active_admin/resource/index')
     end
 

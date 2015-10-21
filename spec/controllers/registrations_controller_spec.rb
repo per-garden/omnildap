@@ -8,7 +8,7 @@ describe Users::RegistrationsController do
     end
 
     it 'lets user sign up' do
-      get :new, {}, {SERVER_NAME:'localhost:3003'}
+      get :new, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}"}
       expect(response).to render_template('devise/registrations/new')
     end
 
@@ -20,7 +20,7 @@ describe Users::RegistrationsController do
       end
 
       it 'does not let user sign up' do
-        get :new, {}, {SERVER_NAME:'localhost:3003'}
+        get :new, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}"}
         expect(response).to redirect_to(root_path)
       end
 

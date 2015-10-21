@@ -14,7 +14,7 @@ describe Admin::BackendsController do
     end
 
     it 'does not list backends' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/admin/backends'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}/admin/backends"}
       expect(response).to_not render_template('active_admin/resource/index')
     end
 
@@ -59,7 +59,7 @@ describe Admin::BackendsController do
     end
 
     it 'lists backends' do
-      get :index, {}, {SERVER_NAME:'localhost:3003/admin/backends'}
+      get :index, {}, {SERVER_NAME:"#{Rails.application.config.ldap_server[:host]}:#{Rails.application.config.ldap_server[:port]}/admin/backends"}
       expect(response).to render_template('active_admin/resource/index')
     end
 
