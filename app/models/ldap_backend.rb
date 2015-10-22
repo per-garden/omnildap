@@ -67,7 +67,7 @@ class LdapBackend < Backend
     self.host ||= 'localhost'
     self.port ||= 10389
     # LDAP objectClass of which to retreive users as instances
-    self.filter ||= "(objectClass=inetOrgPerson)"
+    self.filter ||= "(mail=*)"
     @ldap = Net::LDAP.new(host: host, port: port, base: base)
   end
 

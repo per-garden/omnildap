@@ -7,6 +7,7 @@ FactoryGirl.define do
     base 'ou=' + Faker::Commerce.department + ',dc=' + Faker::Commerce.product_name
     sequence(:admin_name) { Faker::Internet.user_name }
     admin_password Faker::Lorem.characters(9)
+    filter '(objectClass=inetOrgPerson)'
   end
 
   factory :active_directory_backend do
@@ -14,6 +15,7 @@ FactoryGirl.define do
     host Faker::Lorem.word + '.' + Faker::Internet.domain_suffix
     port Faker::Number.number(2)
     base 'ou=' + Faker::Commerce.department + ',dc=' + Faker::Commerce.product_name
+    filter '(mail=*)'
     domain :host
   end
 

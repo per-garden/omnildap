@@ -13,7 +13,6 @@ class ActiveDirectoryBackend < LdapBackend
 
   def init
     super
-    self.filter = "(mail=*)"
     @ldap = Net::LDAP.new(host: host, port: port, base: base)
   end
 
