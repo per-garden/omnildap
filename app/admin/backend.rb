@@ -131,11 +131,11 @@ ActiveAdmin.register Backend do
     end
   
     def ldap_backend_params
-      params.require(:ldap_backend).permit(:name, :description, :host, :base, :port, :admin_name, :admin_password, :blocked, :email_pattern)
+      params.require(:ldap_backend).permit(:name, :description, :host, :base, :port, :admin_name, :admin_password, :filter, :blocked, :email_pattern)
     end
   
     def active_directory_backend_params
-      params.require(:active_directory_backend).permit(:name, :description, :host, :base, :port, :admin_name, :admin_password, :blocked, :email_pattern, :domain)
+      params.require(:active_directory_backend).permit(:name, :description, :host, :base, :port, :admin_name, :admin_password, :filter, :blocked, :email_pattern, :domain)
     end
 
   end
