@@ -83,9 +83,14 @@ class LdapBackend < Backend
   def sync_users(backend_users)
     # Remove local user if no longer exists on backend
     to_be_deleted = []
-    self.users.each do |lu|
-      (backend_users.select {|bu| (bu[:mail][0]).downcase == lu.email}).empty? ? to_be_deleted << lu : nil
-      (backend_users.select {|bu| backend_user_name(bu).downcase == lu.name}).empty? ? to_be_deleted << lu : nil
+    if backend_users && backend_users[0]
+      self.users.each do |lu|
+        (backend_users.select {|bu| (bu[:mail][0]).downcase == lu.email}).empty? ? to_be_deleted << lu : nil
+        (backend_users.select {|bu| backend_user_name(bu).downcase == lu.name}).empty? ? to_be_deleted << lu : nil
+      end
+    else
+      # Backend deleted all users
+      to_be_deleted = self.users
     end
     to_be_deleted.uniq!
     to_be_deleted.each do |du|
@@ -94,23 +99,25 @@ class LdapBackend < Backend
       du.destroy! if du.backends.empty?
     end
     self.save unless to_be_deleted.empty?
-    # Add users from backend unless already exists
-    backend_users.each do |bu|
-      # Backend user name may be fully qualified dn
-      bu_name = backend_user_name(bu)
-      bu_mail = (bu[:mail][0]).downcase
-      u = User.find_by_email(bu_mail) || User.find_by_name(bu_name)
-      if u
-        u.backends << self unless u.backends.include?(self)
-        u.name = bu_name
-        u.email = bu_mail
-        u.save!
-      else
-        password = Faker::Lorem.characters(9)
-        begin
-          User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, backends: [self])
-        rescue
-          #FIXME: This shouldn't happen
+    if backend_users && backend_users[0]
+      # Add users from backend unless already exists
+      backend_users.each do |bu|
+        # Backend user name may be fully qualified dn
+        bu_name = backend_user_name(bu)
+        bu_mail = (bu[:mail][0]).downcase
+        u = User.find_by_email(bu_mail) || User.find_by_name(bu_name)
+        if u
+          u.backends << self unless u.backends.include?(self)
+          u.name = bu_name
+          u.email = bu_mail
+          u.save!
+        else
+          password = Faker::Lorem.characters(9)
+          begin
+            User.create!(name: bu_name, email: bu_mail, password: password, password_confirmation: password, backends: [self])
+          rescue
+            #FIXME: This shouldn't happen
+          end
         end
       end
     end

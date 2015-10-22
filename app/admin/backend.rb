@@ -111,7 +111,15 @@ ActiveAdmin.register Backend do
     def destroy
       backend = Backend.find(params[:id])
       notice = ''
+      to_be_deleted = []
+      backend.users.each do |u|
+        u.backends.delete(backend)
+        to_be_deleted << u if u.backends.empty?
+      end
       if backend && backend.destroy
+        to_be_deleted.each do |du|
+          du.destroy
+        end
         notice = 'Backend deleted'
       else
         notice = "Unable to delete backend #{backend.name_string}"
