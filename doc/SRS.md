@@ -3,7 +3,7 @@
  ?
 
 ###  2 Basic setup
- - 2.1 Code repository shall be at https://code.sonymobile.net
+ - ~~2.1 Code repository shall be at https://code.sonymobile.net~~
  - 2.2 Omnildap shall contain a web server application
  - 2.3 Omnildap shall answer ldap requests
  - 2.4 It shall be possible to run Omnildap temporarily without backend access
