@@ -1,15 +1,144 @@
-== README
+= Omnildap
 
-Omnildap is an LDAP front-end to one or several LDAP or non-LDAP backends. Please refer to wiki pages and doc directory for further information.
+Omnildap is a virtual directory server with an integrated administration web interface, and
+an LDAP frontend to one or several LDAP or non-LDAP backends.
 
-* Omnildap currently uses ruby 2.1.7p400 (2015-08-18 revision 51632) [x86_64-linux].
+== Features
 
-* Rails 4.1.5
+ - LDAP server frontend
+ - Integration with any number of LDAP or non-LDAP backends
+ - User signup capabilities
+ - Restrictable user access based on email
+ - Grouping of users independently of backends
 
-* Current implementation uses MySQL for data persistence
 
-* Basic Rspec tests exist for both Web and LDAP frontends.
+= Installation
 
-* Omnildap listens as a regular web server (port 3000) as well as a simple LDAP server (port 1389)
+== Prerequisites
 
-* ...
+ - Ruby - e.g. from https://www.ruby-lang.org/en/downloads/
+ - Rubygems - e.g. from https://rubygems.org/pages/download
+ - Bundle - gem install bundle
+ - MySQL - e.g. from http://dev.mysql.com/downloads/mysql/
+ - Redis - e.g. from http://redis.io/download
+
+Omnildap was tested and verified on Linux 3.2.29 during Oct 2015 using:
+
+ - ruby 2.1.7p400 (2015-08-18 revision 51632) [x86_64-linux]
+ - Rubygems 2.4.8
+ - Bundler version 1.10.6
+ - Server version: 5.1.69 MySQL Community Server (GPL)
+ - Redis server v=2.6.14 sha=00000000:0 malloc=jemalloc-3.2.0 bits=64, redis-cli 2.6.14
+
+== Download
+
+Clone Omnildap from the repository - e.g 'git clone https://github.com/per-garden/omnildap'. Then enter the directory that was created:
+
+ - cd omnildap
+
+
+= Setup
+
+== Files
+
+Provided sample files to be copied, and adapted are:
+
+ - config/database.yml.sample copy to config/database.yml (required)
+ - config/secrets.yml.sample copy to config/secrets.yml (required - 'rake secret' and don't check in)
+ - config/environments/production.rb.sample copy to config/environments/production.rb (required)
+ - config/environments/development.rb.sample copy to config/environments/development.rb (optional)
+ - config/environments/test.rb.sample copy to config/environments/test.rb (optional)
+ - config/initializers/smtp_settings.rb.sample copy to config/initializers/smtp_settings.rb (optional)
+
+Adapt config/boot.rb if you want to run the Omnildap web interface on any other port than 3003.
+
+== Gems
+
+Make sure you are positioned in the omnildap directory (as created by git clone), and install the required gems:
+
+ - bundle install
+
+
+== Database
+
+Use database credentials and names as set up in config/database.yml (commands below use sample settings). From a MySQL prompt, and as database root user do:
+
+ - CREATE USER 'omnildap'@'localhost' IDENTIFIED BY 'omnildap'; (required)
+ - GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON `omnildap_production`.* TO 'omnildap'@'localhost'; (required)
+ - GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON `omnildap_development`.* TO 'omnildap'@'localhost'; (optional)
+ - GRANT SELECT, LOCK TABLES, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON `omnildap_test`.* TO 'omnildap'@'localhost'; (optional)
+
+Make sure you are positioned in the omnildap directory (as created by git clone), and initiate the database(s):
+
+ - RAILS_ENV=production rake db:create (required)
+ - RAILS_ENV=development rake db:create (optional)
+ - RAILS_ENV=test rake db:create (optional)
+ - RAILS_ENV=production rake db:migrate (required)
+ - RAILS_ENV=development rake db:migrate (optional)
+ - RAILS_ENV=test rake db:migrate (optional)
+
+
+== Initial User
+
+Make sure you are positioned in the omnildap directory (as created by git clone), and create an initial admin user (substitute name, email, and password with real values):
+
+ - RAILS_ENV=production rake add_user 'name' 'email' 'password' (required)
+ - RAILS_ENV=development rake add_user 'name' 'email' 'password' (optional)
+ - RAILS_ENV=production rake make_user_admin 'name'|'email' (required)
+ - RAILS_ENV=development rake make_user_admin 'name'|'email' (optional)
+
+
+== Assets
+
+Precompile javascript and stylesheet assets:
+
+ - RAILS_ENV=production rake assets:precompile
+
+
+= Usage
+
+Make sure you are positioned in the omnildap directory (as created by git clone), and start Omnildap:
+
+ - RAILS_ENV=production rails s -d
+
+This will start two processes - a web frontend for administration, as well as an LDAP server process. Synchronisation with backends will run on startup, and from then on regular intervals as set up in configuration.
+
+Access to Omnildap is granted by authenticating with the backend(s) a user belongs to. Omnildap itself serves as a backend (the admin user previously created belongs to this backend). For admin users, the web interface (e.g. http://localhost:3003) enables backend, user, and group management. Regular users can use the same site as a simple verification of their account. 
+
+A user's credentials are also required for LDAP access (anonymous access is not allowed). Omnildap can serve as an LDAP backbone for any application allowing LDAP authentication.
+
+Example fetching all entries:
+
+ - ldapsearch -H ldap://localhost:1389 -x -D "abc" -W -b "dc=omnildap"
+
+Example searching for all users (no filter will fetch all entries):
+
+ - ldapsearch -H ldap://localhost:1389 -x -D "abc" -W -b "ou=users,dc=omnildap"
+ - ldapsearch -H ldap://localhost:1391 -x -D "abc" -W -b "ou=users,dc=12 volts" "(mail=*)"
+
+Example searching for a specific user:
+
+ - ldapsearch -H ldap://localhost:1389 -x -D "abc" -W -b "ou=users,dc=omnildap" "(cn=orval.ko)"
+ - ldapsearch -H ldap://localhost:1389 -x -D "abc" -W -b "ou=users,dc=omnildap" "(samaccountname=orval.ko)"
+
+Example searching for all groups:
+
+ - ldapsearch -H ldap://localhost:1389 -x -D "abc" -W -b "ou=groups,dc=omnildap" "(cn=*)"
+
+Omnildap provides LDAP data as a flat structure. This has a couple of implications. The only base distinguished names (DN) that can be queried are the ldap_basedn (e.g. dc=omnildap) itself, or ldap_basedn prepended to fetch either users or groups (e.g. ou=users,dc=12 volts). Filters are applied to single attributes (e.g. "(cn=orval.ko)" works, "(ou=users,cn=orval.ko)" does not)
+
+Stop Omnildap by killing the process with id as listed in tmp/pids/server.pid.
+
+
+= Tests
+
+Rspec tests are included. Tests must be run without any Omnildap instance already running.
+
+
+= Future work
+
+The Omnildap project is in a rather early stage of development. Although its applicability has been verified by using it as an LDAP backbone for applications, and with LDAP and ActiveDirectory as Omnildap backends, a lot more could be done. Ideas and contributions are welcome!
+
+On the most imminent wish-list right now is:
+
+ - Support for ldaps (frontend and backend)

@@ -92,6 +92,7 @@ Rails.application.configure do
     :operation_class        => Omnildap::LdapOperation,
     :operation_args         => [],
   }
+  # Arbitrary lower case string
   config.ldap_basedn = 'dc=omnildap'
   # Timeout in seconds, after which giving up backend data retrieval
   config.ldap_backend_timeout = 60
