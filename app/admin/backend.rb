@@ -33,7 +33,6 @@ ActiveAdmin.register Backend do
   filter :email_pattern
   filter :filter
   filter :domain
-  filter :users
 
   show do
     render partial: 'show'
