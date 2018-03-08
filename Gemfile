@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.5'
+gem 'rails', '4.2.5.1'
 # Use mysql as the database for Active Record
 gem "mysql2", group: :mysql
 gem 'acts_as_singleton', '~> 0.0.8'
@@ -31,7 +31,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Ransack and adds Rails 4 support :-)
 # Keep in mind that during the time where we use pre-release label, things can
 # break in each release! :-(
-gem 'activeadmin', '~> 1.0.0.pre1'
+gem 'activeadmin', '1.0.0.pre1'
 
 gem 'faker'
 group :development, :test do
@@ -41,8 +41,8 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'pry-rails'
-  gem 'factory_girl_rails'
-  gem 'fakeldap', '~> 0.1'
+  gem 'factory_bot_rails'
+  gem 'fakeldap', '~> 0.1.1'
 end
 
 gem 'devise'

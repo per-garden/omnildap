@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Admin::GroupsController do
   before do
-    @group = FactoryGirl.build(:group)
+    @group = FactoryBot.build(:group)
     @group.save!
   end
 
@@ -43,7 +43,7 @@ describe Admin::GroupsController do
       @request.env['devise.mapping'] = Devise.mappings[:admin]
       @admin = create(:admin)
       sign_in @admin
-      @deletable_group = FactoryGirl.build(:group)
+      @deletable_group = FactoryBot.build(:group)
       @deletable_group.save!
     end
 

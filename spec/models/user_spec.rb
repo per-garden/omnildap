@@ -6,7 +6,7 @@ describe User do
   end
 
   it 'validates name' do
-    user = FactoryGirl.build(:devise_user) 
+    user = FactoryBot.build(:devise_user) 
     invalid_name = user.email
     user.name = invalid_name
     begin
@@ -19,7 +19,7 @@ describe User do
   end
 
   it 'validates email' do
-    user = FactoryGirl.build(:devise_user) 
+    user = FactoryBot.build(:devise_user) 
     invalid_email = user.email.gsub(/@/,'')
     user.email = invalid_email
     begin

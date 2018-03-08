@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :ldap_backend do
     name Faker::Lorem.word.capitalize

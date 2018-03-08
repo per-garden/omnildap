@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Admin::BackendsController do
   before do
-    @ldap_backend = FactoryGirl.build(:ldap_backend)
+    @ldap_backend = FactoryBot.build(:ldap_backend)
     @ldap_backend.save!
   end
 
@@ -54,7 +54,7 @@ describe Admin::BackendsController do
       @request.env['devise.mapping'] = Devise.mappings[:admin]
       @admin = create(:admin)
       sign_in @admin
-      @deletable_ldap_backend = FactoryGirl.build(:ldap_backend)
+      @deletable_ldap_backend = FactoryBot.build(:ldap_backend)
       @deletable_ldap_backend.save!
     end
 

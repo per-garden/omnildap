@@ -3,9 +3,9 @@ require 'sidekiq/testing'
 
 describe Backend do
   before(:all) do
-    @user = FactoryGirl.build(:devise_user)
+    @user = FactoryBot.build(:devise_user)
     @user.save!
-    @dual_backend_user = FactoryGirl.build(:devise_user)
+    @dual_backend_user = FactoryBot.build(:devise_user)
     @dual_backend_user.save!
     DeviseBackend.instance.name = Faker::Company.name
     DeviseBackend.instance.save!
@@ -13,7 +13,7 @@ describe Backend do
 
   it "it does not have any valid factory (abstract class)" do
     begin
-      b = FactoryGirl.build(:backend)
+      b = FactoryBot.build(:backend)
     rescue
       # Expecting this to fail
     end
@@ -23,7 +23,7 @@ describe Backend do
   describe 'using devise backend' do
 
     it 'does not allow duplicate user name within backend' do
-      @another_user = FactoryGirl.build(:devise_user, name: @user.name)
+      @another_user = FactoryBot.build(:devise_user, name: @user.name)
       begin
         @another_user.save!
         DeviseBackend.instance.users << @another_user
@@ -35,7 +35,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user email within backend' do
-      @another_user = FactoryGirl.build(:devise_user, email: @user.email)
+      @another_user = FactoryBot.build(:devise_user, email: @user.email)
       begin
         @another_user.save!
         DeviseBackend.instance.users << @another_user
@@ -53,12 +53,12 @@ describe Backend do
 
   describe 'using ldap backend' do
     before(:all) do
-      @ldap_backend = FactoryGirl.build(:ldap_backend)
+      @ldap_backend = FactoryBot.build(:ldap_backend)
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.add_user("#{@ldap_backend.admin_name}" ,"#{@ldap_backend.admin_password}", 'ldap_backend_admin@ldap_backend.name')
       @server.run_tcpserver
       @ldap_backend.save!
-      @user = FactoryGirl.build(:user)
+      @user = FactoryBot.build(:user)
       @server.add_user("cn=#{@user.name},#{@ldap_backend.base}" ,"#{@user.password}", "#{@user.email}")
       Sidekiq::Testing.inline! do
         BackendSyncWorker.perform_async
@@ -70,7 +70,7 @@ describe Backend do
     end
 
     before(:each) do
-      @user = FactoryGirl.build(:user)
+      @user = FactoryBot.build(:user)
       @server.add_user("cn=#{@user.name},#{@ldap_backend.base}" ,"#{@user.password}", "#{@user.email}")
       Sidekiq::Testing.inline! do
         BackendSyncWorker.perform_async
@@ -87,7 +87,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user name within backend' do
-      @another_user = FactoryGirl.build(:user, name: @user.name)
+      @another_user = FactoryBot.build(:user, name: @user.name)
       begin
         @server.add_user("cn=#{@another_user.name},#{@ldap_backend.base}" ,"#{@another_user.password}", "#{@another_user.email}")
         Sidekiq::Testing.inline! do
@@ -100,7 +100,7 @@ describe Backend do
     end
 
     it 'does not allow duplicate user email within backend' do
-      @another_user = FactoryGirl.build(:user, email: @user.email)
+      @another_user = FactoryBot.build(:user, email: @user.email)
       begin
         @server.add_user("cn=#{@another_user.name},#{@ldap_backend.base}" ,"#{@another_user.password}", "#{@another_user.email}")
         Sidekiq::Testing.inline! do

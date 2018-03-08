@@ -6,7 +6,7 @@ describe Omnildap::LdapServer do
     @devise_backend = DeviseBackend.instance
     @devise_backend.name = Faker::Company.name
     @devise_backend.save!
-    @admin = FactoryGirl.build(:admin)
+    @admin = FactoryBot.build(:admin)
     @admin.backends << @devise_backend
     @admin.save!
     Sidekiq::Testing.inline! do
@@ -19,10 +19,10 @@ describe Omnildap::LdapServer do
   
   describe 'using devise backend' do
     before(:all) do
-      @user = FactoryGirl.build(:devise_user)
+      @user = FactoryBot.build(:devise_user)
       @user.backends << @devise_backend
       @user.save!
-      @blocked_user = FactoryGirl.build(:blocked_user)
+      @blocked_user = FactoryBot.build(:blocked_user)
       @blocked_user.backends << @devise_backend
       @blocked_user.save!
     end
@@ -136,8 +136,8 @@ describe Omnildap::LdapServer do
 
   describe 'using ldap backend' do
     before(:all) do
-      @ldap_backend_user = FactoryGirl.build(:user)
-      @ldap_backend = FactoryGirl.build(:ldap_backend)
+      @ldap_backend_user = FactoryBot.build(:user)
+      @ldap_backend = FactoryBot.build(:ldap_backend)
       @ldap_backend.save!
       @server = FakeLDAP::Server.new(port: @ldap_backend.port, base: @ldap_backend.base)
       @server.run_tcpserver
@@ -250,8 +250,8 @@ describe Omnildap::LdapServer do
 
   describe 'group handling' do
     before(:all) do
-      @group = FactoryGirl.build(:group)
-      @group_user = FactoryGirl.create(:devise_user)
+      @group = FactoryBot.build(:group)
+      @group_user = FactoryBot.create(:devise_user)
       @group_user.groups << @group
       @group.save!
       @filter = Net::LDAP::Filter.eq( :cn, '*' )
@@ -272,7 +272,7 @@ describe Omnildap::LdapServer do
 
    describe 'adding' do
      before(:each) do
-       @addable_group_user = FactoryGirl.create(:devise_user)
+       @addable_group_user = FactoryBot.create(:devise_user)
        @addable_group_user.groups << @group
        @group.save!
      end
@@ -310,7 +310,7 @@ describe Omnildap::LdapServer do
 
    describe 'removing' do
      before(:each) do
-       @deletable_group_user = FactoryGirl.build(:devise_user)
+       @deletable_group_user = FactoryBot.build(:devise_user)
        @deletable_group_user.groups << @group
        @deletable_group_user.save!
      end
